@@ -1,14 +1,5 @@
 import Sidebar from "./Sidebar";
-
-const NAV_ITEMS = [
-  { key: "overview", label: "Overview" },
-  { key: "proxies", label: "Proxies" },
-  { key: "rules", label: "Rules" },
-  { key: "conns", label: "Conns" },
-  { key: "config", label: "Config" },
-  { key: "logs", label: "Logs" },
-  { key: "profiles", label: "Profiles" } // boleh hapus kalau belum ada page Profiles
-];
+import { NAV_ITEMS } from "../../lib/navConfig";
 
 export default function AppLayout({ children, activePage, onChangePage }) {
   return (

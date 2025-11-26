@@ -2,25 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
 import { getConnections, connectTraffic } from "../lib/clashApi";
-
-// helper format byte
-function formatBytes(bytes) {
-  if (bytes == null || isNaN(bytes)) return "-";
-  const units = ["B", "KB", "MB", "GB", "TB"];
-  let i = 0;
-  let v = Number(bytes);
-  while (v >= 1024 && i < units.length - 1) {
-    v /= 1024;
-    i++;
-  }
-  return `${v.toFixed(2)} ${units[i]}`;
-}
-
-// helper format speed
-function formatSpeed(bytesPerSec) {
-  if (bytesPerSec == null || isNaN(bytesPerSec)) return "-";
-  return `${formatBytes(bytesPerSec)}/s`;
-}
+import { formatBytes, formatSpeed } from "../lib/utils";
 
 export default function Overview() {
   const [traffic, setTraffic] = useState(null);

@@ -1,12 +1,4 @@
-const items = [
-  { key: "overview", label: "Overview" },
-  { key: "proxies", label: "Proxies" },
-  { key: "rules", label: "Rules" },
-  { key: "conns", label: "Conns" },
-  { key: "config", label: "Config" },
-  { key: "logs", label: "Logs" },
-  { key: "profiles", label: "Profiles" }
-];
+import { NAV_ITEMS } from "../../lib/navConfig";
 
 export default function Sidebar({ activePage, onChangePage }) {
   return (
@@ -25,7 +17,7 @@ export default function Sidebar({ activePage, onChangePage }) {
 
       <nav className="bg-slate-900/60 border border-slate-800/80 rounded-3xl p-3 shadow-soft backdrop-blur-xl flex-1 flex flex-col justify-between">
         <div className="flex flex-col gap-1">
-          {items.map((item) => (
+          {NAV_ITEMS.map((item) => (
             <button
               key={item.key}
               onClick={() => onChangePage(item.key)}
