@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { THEMES, getInitialThemeId, DEFAULT_THEME_ID } from "./themes";
 
 const ThemeContext = createContext({
@@ -24,7 +24,11 @@ export function ThemeProvider({ children }) {
     setThemeId
   };
 
-  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
+  return React.createElement(
+    ThemeContext.Provider,
+    { value },
+    children
+  );
 }
 
 export function useTheme() {
