@@ -1,7 +1,10 @@
 import Sidebar from "./Sidebar";
 import { NAV_ITEMS } from "../../lib/navConfig";
+import { useTheme } from "../../lib/themeContext";
 
 export default function AppLayout({ children, activePage, onChangePage }) {
+  const { theme } = useTheme();
+
   return (
     <div className="relative z-10 flex min-h-screen">
       {/* Sidebar: hanya tampil di md+ */}
@@ -13,7 +16,7 @@ export default function AppLayout({ children, activePage, onChangePage }) {
         <header className="md:hidden px-4 pt-4 pb-2 flex items-center justify-between">
           <div>
             <div className="text-sm font-semibold tracking-tight">
-              Sing-box <span className="text-sky-400">Glass</span>
+              Vortex-x <span className="text-sky-400">Dashboard</span>
             </div>
             <div className="text-[11px] text-slate-400">
               {NAV_ITEMS.find((i) => i.key === activePage)?.label || "Overview"}
@@ -29,7 +32,11 @@ export default function AppLayout({ children, activePage, onChangePage }) {
 
         {/* Bottom nav khusus mobile */}
         <nav className="md:hidden sticky bottom-0 left-0 right-0 z-20">
-          <div className="mx-3 mb-3 rounded-3xl border border-slate-800/80 bg-slate-950/90 backdrop-blur-xl shadow-soft flex justify-between px-2 py-1.5">
+          <div
+            className={`mx-3 mb-3 rounded-3xl px-2 py-1.5 shadow-soft flex justify-between ${
+              theme.bottomNav
+            }`}
+          >
             {NAV_ITEMS.map((item) => {
               const active = item.key === activePage;
               return (

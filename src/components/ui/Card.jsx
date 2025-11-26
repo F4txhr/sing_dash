@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { useTheme } from "../../lib/themeContext";
 
 export default function Card({
   title,
@@ -7,14 +8,15 @@ export default function Card({
   className = "",
   headerRight
 }) {
+  const { theme } = useTheme();
+  const cardBase =
+    theme?.card ||
+    "rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 shadow-[0_0_25px_-8px_rgba(0,0,0,0.8)]";
+
   return (
     <section
       className={clsx(
-        "rounded-2xl",
-        "bg-white/5",
-        "backdrop-blur-xl",
-        "border border-white/10",
-        "shadow-[0_0_25px_-8px_rgba(0,0,0,0.8)]",
+        cardBase,
         "px-4 py-3 md:px-5 md:py-4",
         "text-slate-100",
         className

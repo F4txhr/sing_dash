@@ -1,21 +1,30 @@
 import { NAV_ITEMS } from "../../lib/navConfig";
+import { THEMES } from "../../lib/themes";
+import { useTheme } from "../../lib/themeContext";
 
 export default function Sidebar({ activePage, onChangePage }) {
+  const { themeId, setThemeId } = useTheme();
+  const theme = THEMES[themeId];
+
   return (
     <aside className="hidden md:flex flex-col w-64 px-4 py-4 gap-4">
-      <div className="bg-slate-900/60 border border-slate-800/80 rounded-3xl p-4 shadow-soft backdrop-blur-xl">
+      <div
+        className={`${theme.sidebar} rounded-3xl p-4 shadow-soft`}
+      >
         <div className="flex items-center gap-2 mb-1">
           <div className="w-8 h-8 rounded-2xl bg-sky-500/50 blur-[2px]" />
           <div>
             <div className="text-sm font-semibold tracking-tight">
-              Sing-box <span className="text-sky-400">Glass</span>
+              Vortex-x <span className="text-sky-400">Dashboard</span>
             </div>
-            <div className="text-[11px] text-slate-400">Live Dashboard</div>
+            <div className="text-[11px] text-slate-400">Local Sing-box panel</div>
           </div>
         </div>
       </div>
 
-      <nav className="bg-slate-900/60 border border-slate-800/80 rounded-3xl p-3 shadow-soft backdrop-blur-xl flex-1 flex flex-col justify-between">
+      <nav
+        className={`${theme.sidebar} rounded-3xl p-3 shadow-soft flex-1 flex flex-col justify-between`}
+      >
         <div className="flex flex-col gap-1">
           {NAV_ITEMS.map((item) => (
             <button
@@ -34,9 +43,22 @@ export default function Sidebar({ activePage, onChangePage }) {
           ))}
         </div>
 
-        <div className="mt-4 text-[11px] text-slate-500">
-          <div>Theme: Glass • Blur</div>
-          <div className="opacity-70">API: Clash-compatible</div>
+        <div className="mt-4 text-[11px] text-slate-500 space-y-1">
+          <div className="flex items-center justify-between gap-2">
+            <span>Theme</span>
+            <select
+              className="rounded-2xl bg-slate-950/60 border border-slate-700/80 px-2 py-1 text-[11px] outline-none focus:border-sky-500"
+              value={themeId}
+              onChange={(e) => setThemeId(e.target.value)}
+            >
+              {Object.values(THEMES).map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="opacity-70">API: Sing-box / Clash-compatible</div>
         </div>
       </nav>
     </aside>
