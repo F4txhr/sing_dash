@@ -4,12 +4,7 @@ import Button from "../ui/Button";
 import { formatBytes } from "../../lib/utils";
 
 const DEFAULT_URL = "https://speed.cloudflare.com/__down?bytes=20000000";
-const MIN_TEST_DURATION_SEC = 5;seEffect, useState } from "react";
-import Card from "../ui/Card";
-import Button from "../ui/Button";
-import { formatBytes } from "../../lib/utils";
-
-const DEFAULT_URL = "https://speed.cloudflare.com/__down?bytes=20000000";
+const MIN_TEST_DURATION_SEC = 5;
 
 function parseExpectedBytes(url) {
   try {
