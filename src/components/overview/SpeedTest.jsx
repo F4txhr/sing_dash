@@ -1,9 +1,20 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Card from "../ui/Card";
 import Button from "../ui/Button";
 import { formatBytes } from "../../lib/utils";
 
 const DEFAULT_URL = "https://speed.cloudflare.com/__down?bytes=5000000";
+
+function parseExpectedBytes(url) {
+  try {
+    const m = url.match(/[?&]bytes=(\d+)/);
+    if (!m) return null;
+    const n = Number(m[1]);
+    return Number.isFinite(n) && n > 0 ? n : null;
+  } catch {
+    return null;
+  }
+}
 
 export default function SpeedTest() {
   const [url, setUrl] = useState(DEFAULT_URL);
@@ -11,11 +22,53 @@ export default function SpeedTest() {
   const [error, setError] = useState("");
   const [result, setResult] = useState(null);
 
+  // live state
+  const [liveBytes, setLiveBytes] = useState(0);
+  const [liveSeconds, setLiveSeconds] = useState(0);
+  const [liveMbps, setLiveMbps] = useState(0);
+  const [expectedBytes, setExpectedBytes] = useState(null);
+
+  // ip / ISP info
+  const [ipInfo, setIpInfo] = useState(null);
+  const [ipError, setIpError] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadIp = async () => {
+      try {
+        const res = await fetch("https://ipapi.co/json/");
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        if (!cancelled) setIpInfo(data);
+      } catch (e) {
+        if (!cancelled) {
+          setIpError(
+            e?.message ||
+              "Gagal mengambil info IP/ISP (ipapi.co). Coba lagi nanti."
+          );
+        }
+      }
+    };
+
+    loadIp();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const handleRun = async () => {
     if (!url.trim()) return;
     setRunning(true);
     setError("");
     setResult(null);
+    setLiveBytes(0);
+    setLiveSeconds(0);
+    setLiveMbps(0);
+
+    const exp = parseExpectedBytes(url);
+    setExpectedBytes(exp || null);
 
     const startedAt = Date.now();
     const cacheBustedUrl =
@@ -35,16 +88,32 @@ export default function SpeedTest() {
 
       if (res.body && res.body.getReader) {
         const reader = res.body.getReader();
-        // stream data dan hitung total bytes
+        // stream data dan hitung total bytes, update indikator realtime
         for (;;) {
           const { done, value } = await reader.read();
           if (done) break;
-          if (value) bytes += value.length || value.byteLength || 0;
+          if (value) {
+            const chunkBytes = value.length || value.byteLength || 0;
+            bytes += chunkBytes;
+            const elapsedSec = (performance.now() - start) / 1000;
+            const mbps =
+              elapsedSec > 0 ? (bytes * 8) / (elapsedSec * 1_000_000) : 0;
+
+            setLiveBytes(bytes);
+            setLiveSeconds(elapsedSec);
+            setLiveMbps(mbps);
+          }
         }
       } else {
         // fallback: download penuh ke memory
         const buf = await res.arrayBuffer();
         bytes = buf.byteLength;
+        const elapsedSec = (performance.now() - start) / 1000;
+        const mbps =
+          elapsedSec > 0 ? (bytes * 8) / (elapsedSec * 1_000_000) : 0;
+        setLiveBytes(bytes);
+        setLiveSeconds(elapsedSec);
+        setLiveMbps(mbps);
       }
 
       const elapsedSec = (performance.now() - start) / 1000;
@@ -67,6 +136,11 @@ export default function SpeedTest() {
     }
   };
 
+  const progress =
+    expectedBytes && expectedBytes > 0
+      ? Math.min((liveBytes / expectedBytes) * 100, 100)
+      : null;
+
   return (
     <Card
       title="Speed test"
@@ -88,24 +162,66 @@ export default function SpeedTest() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
-          <Button size="sm" onClick={handleRun} disabled={running}>
-            {running ? "Testing..." : "Run speed test"}
-          </Button>
-          {result && (
-            <div className="text-[11px] text-slate-300 space-x-2">
-              <span>
-                Download:{" "}
-                <span className="font-semibold">
-                  {result.mbps.toFixed(2)} Mbps
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <Button size="sm" onClick={handleRun} disabled={running}>
+              {running ? "Testing..." : "Run speed test"}
+            </Button>
+            {(running || result) && (
+              <div className="text-[11px] text-slate-300 space-x-2">
+                <span>
+                  Download:{" "}
+                  <span className="font-semibold">
+                    {(running ? liveMbps : result?.mbps || 0).toFixed(2)} Mbps
+                  </span>
                 </span>
-              </span>
-              <span className="text-slate-500">•</span>
-              <span>
-                Data: {formatBytes(result.bytes)} /{" "}
-                {result.seconds.toFixed(2)}s
-              </span>
+                <span className="text-slate-500">•</span>
+                <span>
+                  Data: {formatBytes(running ? liveBytes : result?.bytes || 0)}{" "}
+                  / {(running ? liveSeconds : result?.seconds || 0).toFixed(2)}s
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* indikator progres sederhana */}
+          {(running || liveBytes > 0) && (
+            <div className="space-y-1">
+              <div className="h-1.5 rounded-full bg-slate-800/80 overflow-hidden">
+                <div
+                  className="h-full bg-sky-500 transition-[width] duration-150"
+                  style={{ width: `${progress ?? 100}%` }}
+                />
+              </div>
+              <div className="flex justify-between text-[10px] text-slate-500">
+                <span>{formatBytes(liveBytes)} downloaded</span>
+                {progress != null && (
+                  <span>{Math.round(progress)}%</span>
+                )}
+              </div>
             </div>
+          )}
+        </div>
+
+        {/* Info IP / ISP / lokasi */}
+        <div className="border border-slate-800/80 rounded-2xl px-3 py-2 bg-slate-950/40 space-y-1">
+          <div className="text-[11px] text-slate-400 mb-0.5">
+            IP &amp; ISP (via ipapi.co)
+          </div>
+          {ipInfo ? (
+            <>
+              <div className="text-[11px] text-slate-200">
+                {ipInfo.ip} • {ipInfo.org || ipInfo.org_name || "Unknown ISP"}
+              </div>
+              <div className="text-[10px] text-slate-400">
+                {ipInfo.city}, {ipInfo.region}{", "}
+                {ipInfo.country_name} • {ipInfo.asn || ipInfo.country}
+              </div>
+            </>
+          ) : ipError ? (
+            <div className="text-[10px] text-rose-300">{ipError}</div>
+          ) : (
+            <div className="text-[10px] text-slate-500">Memuat info IP...</div>
           )}
         </div>
 
