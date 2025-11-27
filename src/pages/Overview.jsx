@@ -3,7 +3,6 @@ import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
 import TrafficChart from "../components/overview/TrafficChart";
 import ConnectionsSnapshot from "../components/overview/ConnectionsSnapshot";
-import SpeedTest from "../components/overview/SpeedTest";
 import { getConnections, connectTraffic } from "../lib/clashApi";
 import { formatBytes, formatSpeed } from "../lib/utils";
 
@@ -295,9 +294,6 @@ export default function Overview() {
         <TrafficChart history={history} />
         <ConnectionsSnapshot conns={conns} />
       </div>
-
-      {/* Speed test */}
-      <SpeedTest />
 
       {/* auto refresh info kecil di mobile */}
       <div className="md:hidden text-[11px] text-slate-400">
