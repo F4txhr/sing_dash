@@ -3,7 +3,13 @@ import Card from "../ui/Card";
 import Button from "../ui/Button";
 import { formatBytes } from "../../lib/utils";
 
-const DEFAULT_URL = "https://speed.cloudflare.com/__down?bytes=5000000";
+const DEFAULT_URL = "https://speed.cloudflare.com/__down?bytes=20000000";
+const MIN_TEST_DURATION_SEC = 5;seEffect, useState } from "react";
+import Card from "../ui/Card";
+import Button from "../ui/Button";
+import { formatBytes } from "../../lib/utils";
+
+const DEFAULT_URL = "https://speed.cloudflare.com/__down?bytes=20000000";
 
 function parseExpectedBytes(url) {
   try {
@@ -70,9 +76,9 @@ export default function SpeedTest() {
     const exp = parseExpectedBytes(url);
     setExpectedBytes(exp || null);
 
-    const startedAt = Date.now();
+    const startedAt = performance.now();
     const cacheBustedUrl =
-      url + (url.includes("?") ? "&" : "?") + "_t=" + startedAt;
+      url + (url.includes("?") ? "&" : "?") + "_t=" + Date.now();
 
     try {
       const res = await fetch(cacheBustedUrl, {
@@ -84,7 +90,7 @@ export default function SpeedTest() {
       }
 
       let bytes = 0;
-      const start = performance.now();
+      const downloadStart = performance.now();
 
       if (res.body && res.body.getReader) {
         const reader = res.body.getReader();
@@ -95,7 +101,7 @@ export default function SpeedTest() {
           if (value) {
             const chunkBytes = value.length || value.byteLength || 0;
             bytes += chunkBytes;
-            const elapsedSec = (performance.now() - start) / 1000;
+            const elapsedSec = (performance.now() - downloadStart) / 1000;
             const mbps =
               elapsedSec > 0 ? (bytes * 8) / (elapsedSec * 1_000_000) : 0;
 
@@ -108,7 +114,7 @@ export default function SpeedTest() {
         // fallback: download penuh ke memory
         const buf = await res.arrayBuffer();
         bytes = buf.byteLength;
-        const elapsedSec = (performance.now() - start) / 1000;
+        const elapsedSec = (performance.now() - downloadStart) / 1000;
         const mbps =
           elapsedSec > 0 ? (bytes * 8) / (elapsedSec * 1_000_000) : 0;
         setLiveBytes(bytes);
@@ -116,16 +122,25 @@ export default function SpeedTest() {
         setLiveMbps(mbps);
       }
 
-      const elapsedSec = (performance.now() - start) / 1000;
+      const downloadElapsedSec = (performance.now() - downloadStart) / 1000;
       const mbps =
-        elapsedSec > 0 ? (bytes * 8) / (elapsedSec * 1_000_000) : 0;
+        downloadElapsedSec > 0
+          ? (bytes * 8) / (downloadElapsedSec * 1_000_000)
+          : 0;
 
       setResult({
         bytes,
-        seconds: elapsedSec,
+        seconds: downloadElapsedSec,
         mbps,
         finishedAt: new Date().toISOString()
       });
+
+      // pastikan animasi test terasa agak lama
+      const wallElapsed = (performance.now() - startedAt) / 1000;
+      if (wallElapsed < MIN_TEST_DURATION_SEC) {
+        const waitMs = (MIN_TEST_DURATION_SEC - wallElapsed) * 1000;
+        await new Promise((resolve) => setTimeout(resolve, waitMs));
+      }
     } catch (e) {
       setError(
         e?.message ||
@@ -141,21 +156,31 @@ export default function SpeedTest() {
       ? Math.min((liveBytes / expectedBytes) * 100, 100)
       : null;
 
-  const displayMbps = (running ? liveMbps : result?.mbps || 0).toFixed(2);
-  const displayBytes = formatBytes(running ? liveBytes : result?.bytes || 0);
-  const displaySeconds = (
-    running ? liveSeconds : result?.seconds || 0
-  ).toFixed(2);
+  const currentMbps = running ? liveMbps : result?.mbps || 0;
+  const currentBytes = running ? liveBytes : result?.bytes || 0;
+  const currentSeconds = running ? liveSeconds : result?.seconds || 0;
+
+  // speedometer mapping
+  const MAX_Mbps = 300;
+  const capped = Math.max(0, Math.min(currentMbps, MAX_Mbps));
+  const ratio = capped / MAX_Mbps; // 0..1
+  const angle = -110 + ratio * 220; // -110deg .. +110deg
+  const rad = (angle * Math.PI) / 180;
+  const needleLength = 32;
+  const centerX = 50;
+  const centerY = 50;
+  const needleX = centerX + needleLength * Math.cos(rad);
+  const needleY = centerY + needleLength * Math.sin(rad);
 
   return (
     <Card className="!p-0 overflow-hidden">
-      <div className="relative p-4 md:p-5 rounded-2xl bg-gradient-to-br from-sky-500/25 via-indigo-500/15 to-fuchsia-500/25 border border-white/10">
+      <div className="relative p-4 md:p-5 rounded-2xl bg-gradient-to-br from-sky-500/25 via-indigo-500/20 to-fuchsia-500/25 border border-white/10">
         {/* glow background */}
         <div className="pointer-events-none absolute -top-32 -right-10 w-64 h-64 bg-sky-400/30 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-40 -left-10 w-72 h-72 bg-purple-500/30 blur-3xl" />
 
         <div className="relative grid gap-4 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
-          {/* left: main speed indicator */}
+          {/* left: speedometer */}
           <div className="flex flex-col justify-between gap-4">
             <div className="flex items-center justify-between text-[11px] text-slate-100/80">
               <div className="flex items-center gap-2">
@@ -172,23 +197,139 @@ export default function SpeedTest() {
               {result && !running && (
                 <span className="text-slate-200">
                   Last:{" "}
-                  <span className="font-semibold">{displayMbps} Mbps</span>
+                  <span className="font-semibold">
+                    {currentMbps.toFixed(2)} Mbps
+                  </span>
                 </span>
               )}
             </div>
 
             <div className="flex flex-col items-center justify-center py-2">
-              <div className="text-[11px] uppercase tracking-[0.2em] text-slate-200/80 mb-1">
-                DOWNLOAD
+              <div className="w-full max-w-xs md:max-w-sm">
+                <svg
+                  viewBox="0 0 100 60"
+                  className="w-full h-32 md:h-36"
+                  preserveAspectRatio="xMidYMid meet"
+                >
+                  <defs>
+                    <linearGradient
+                      id="speedArc"
+                      x1="0%"
+                      y1="100%"
+                      x2="100%"
+                      y2="0%"
+                    >
+                      <stop offset="0%" stopColor="#22c55e" />
+                      <stop offset="40%" stopColor="#eab308" />
+                      <stop offset="100%" stopColor="#ef4444" />
+                    </linearGradient>
+                    <filter id="softGlowSpeed">
+                      <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" />
+                    </filter>
+                  </defs>
+
+                  {/* background arc */}
+                  <path
+                    d="M10 50 A40 40 0 0 1 90 50"
+                    fill="none"
+                    stroke="#020617"
+                    strokeWidth="6"
+                    strokeLinecap="round"
+                  />
+
+                  {/* colored arc */}
+                  <path
+                    d="M10 50 A40 40 0 0 1 90 50"
+                    fill="none"
+                    stroke="url(#speedArc)"
+                    strokeWidth="4"
+                    strokeLinecap="round"
+                    filter="url(#softGlowSpeed)"
+                  />
+
+                  {/* tick marks */}
+                  {Array.from({ length: 7 }).map((_, idx) => {
+                    const tRatio = idx / 6; // 0..1
+                    const tAngle = -110 + tRatio * 220;
+                    const tRad = (tAngle * Math.PI) / 180;
+                    const rOuter = 42;
+                    const rInner = idx % 3 === 0 ? 36 : 38;
+                    const x1 = centerX + rInner * Math.cos(tRad);
+                    const y1 = centerY + rInner * Math.sin(tRad);
+                    const x2 = centerX + rOuter * Math.cos(tRad);
+                    const y2 = centerY + rOuter * Math.sin(tRad);
+                    return (
+                      <line
+                        key={idx}
+                        x1={x1}
+                        y1={y1}
+                        x2={x2}
+                        y2={y2}
+                        stroke="#111827"
+                        strokeWidth={idx % 3 === 0 ? 1.4 : 0.7}
+                      />
+                    );
+                  })}
+
+                  {/* needle */}
+                  <line
+                    x1={centerX}
+                    y1={centerY}
+                    x2={needleX}
+                    y2={needleY}
+                    stroke="#e5e7eb"
+                    strokeWidth="2.4"
+                    strokeLinecap="round"
+                  />
+                  {/* needle center */}
+                  <circle
+                    cx={centerX}
+                    cy={centerY}
+                    r="3.2"
+                    fill="#0f172a"
+                    stroke="#e5e7eb"
+                    strokeWidth="1.2"
+                  />
+
+                  {/* labels 0 - MAX */}
+                  <text
+                    x="14"
+                    y="54"
+                    fontSize="4"
+                    fill="#9ca3af"
+                    textAnchor="middle"
+                  >
+                    0
+                  </text>
+                  <text
+                    x="50"
+                    y="40"
+                    fontSize="4"
+                    fill="#9ca3af"
+                    textAnchor="middle"
+                  >
+                    {Math.round(MAX_Mbps / 2)}
+                  </text>
+                  <text
+                    x="86"
+                    y="54"
+                    fontSize="4"
+                    fill="#9ca3af"
+                    textAnchor="middle"
+                  >
+                    {MAX_Mbps}
+                  </text>
+                </svg>
               </div>
-              <div className="flex items-end gap-2">
-                <span className="text-4xl md:text-5xl font-semibold tracking-tight text-slate-50 drop-shadow-[0_0_12px_rgba(15,23,42,0.8)]">
-                  {displayMbps}
+
+              <div className="mt-2 flex items-end gap-2">
+                <span className="text-3xl md:text-4xl font-semibold tracking-tight text-slate-50 drop-shadow-[0_0_12px_rgba(15,23,42,0.8)]">
+                  {currentMbps.toFixed(2)}
                 </span>
                 <span className="pb-1 text-xs text-slate-200/80">Mbps</span>
               </div>
-              <div className="mt-2 text-[11px] text-slate-200/80">
-                {displayBytes} • {displaySeconds}s
+              <div className="mt-1 text-[11px] text-slate-200/80">
+                {formatBytes(currentBytes)} • {currentSeconds.toFixed(2)}s
               </div>
             </div>
 
@@ -218,7 +359,7 @@ export default function SpeedTest() {
             </div>
           </div>
 
-          {/* right: URL + IP/ISP */}
+          {/* right: URL + IP/ISP + error */}
           <div className="space-y-3 text-xs">
             <div className="space-y-1">
               <div className="text-[11px] text-slate-100/80">Test URL</div>
