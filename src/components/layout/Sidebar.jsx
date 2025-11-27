@@ -1,10 +1,12 @@
 import { NAV_ITEMS } from "../../lib/navConfig";
 import { THEMES } from "../../lib/themes";
 import { useTheme } from "../../lib/themeContext";
+import { useConnectionStatus } from "../../lib/connectionStatus";
 
 export default function Sidebar({ activePage, onChangePage }) {
   const { themeId, setThemeId } = useTheme();
   const theme = THEMES[themeId];
+  const { status } = useConnectionStatus();
 
   return (
     <aside className="hidden md:flex flex-col w-64 px-4 py-4 gap-4">
@@ -58,7 +60,25 @@ export default function Sidebar({ activePage, onChangePage }) {
               ))}
             </select>
           </div>
-          <div className="opacity-70">API: Sing-box / Clash-compatible</div>
+          <div className="flex items-center gap-1 opacity-80">
+            <span
+              className={`w-1.5 h-1.5 rounded-full ${
+                status === "ok"
+                  ? "bg-emerald-400"
+                  : status === "error"
+                  ? "bg-rose-400"
+                  : "bg-slate-500"
+              }`}
+            />
+            <span>
+              API:{" "}
+              {status === "ok"
+                ? "Online"
+                : status === "error"
+                ? "Error"
+                : "Unknown"}
+            </span>
+          </div>
         </div>
       </nav>
     </aside>

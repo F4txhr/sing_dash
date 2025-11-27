@@ -3,34 +3,58 @@ import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
 import { getApiConfig, setApiConfig } from "../lib/apiConfig";
 import { getConfigs, updateConfig } from "../lib/clashApi";
+import { useConnectionStatus } from "../lib/connectionStatus";
 
 export default function ConfigPage() {
   const [apiCfg, setApiCfgState] = useState(getApiConfig());
   const [cfg, setCfg] = useState(null);
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
+  const { setConnectionStatus } = useConnectionStatus();
 
-  const loadCfg = async () => {
+  const loadCfg = async (updateStatus = false) => {
     try {
       setLoading(true);
       setMsg("");
       const c = await getConfigs();
       setCfg(c);
+      if (updateStatus) {
+        setConnectionStatus({
+          status: "ok",
+          lastError: "",
+          lastChecked: new Date().toISOString()
+        });
+        setMsg("API OK: /configs berhasil di-load.");
+      }
     } catch (e) {
-      setMsg("Error load /configs: " + e.message);
+      const message = e.message || String(e);
+      if (updateStatus) {
+        setConnectionStatus({
+          status: "error",
+          lastError: message,
+          lastChecked: new Date().toISOString()
+        });
+        setMsg("Error test /configs: " + message);
+      } else {
+        setMsg("Error load /configs: " + message);
+      }
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadCfg();
+    loadCfg(false);
   }, []);
 
   const handleSaveApi = () => {
     const merged = setApiConfig(apiCfg);
     setApiCfgState(merged);
     setMsg("API config saved. Silakan refresh halaman lain.");
+  };
+
+  const handleTestConnection = () => {
+    loadCfg(true);
   };
 
   const handlePatchConfig = async () => {
@@ -97,9 +121,19 @@ export default function ConfigPage() {
                 }
               />
             </div>
-            <Button size="sm" onClick={handleSaveApi}>
-              Save API settings
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button size="sm" onClick={handleSaveApi}>
+                Save API settings
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={handleTestConnection}
+                disabled={loading}
+              >
+                {loading ? "Testing..." : "Test connection"}
+              </Button>
+            </div>
           </div>
         </Card>
 
