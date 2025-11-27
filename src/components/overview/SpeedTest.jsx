@@ -141,95 +141,127 @@ export default function SpeedTest() {
       ? Math.min((liveBytes / expectedBytes) * 100, 100)
       : null;
 
-  return (
-    <Card
-      title="Speed test"
-      description="Download speed sederhana via HTTP (bergantung CORS pada URL yang dipilih)."
-    >
-      <div className="space-y-3 text-xs">
-        <div className="space-y-1">
-          <div className="text-slate-400">Test URL</div>
-          <input
-            className="w-full rounded-2xl bg-slate-950/40 border border-slate-700/80 px-3 py-2 text-xs outline-none focus:border-sky-500"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            placeholder="https://example.com/large-file.bin"
-          />
-          <p className="text-[11px] text-slate-500">
-            Gunakan URL file yang cukup besar dan mengizinkan CORS. Trafik
-            akan melewati jalur Sing-box saat browser ini menggunakan proxy
-            tersebut.
-          </p>
-        </div>
+  const displayMbps = (running ? liveMbps : result?.mbps || 0).toFixed(2);
+  const displayBytes = formatBytes(running ? liveBytes : result?.bytes || 0);
+  const displaySeconds = (
+    running ? liveSeconds : result?.seconds || 0
+  ).toFixed(2);
 
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <Button size="sm" onClick={handleRun} disabled={running}>
-              {running ? "Testing..." : "Run speed test"}
-            </Button>
-            {(running || result) && (
-              <div className="text-[11px] text-slate-300 space-x-2">
-                <span>
-                  Download:{" "}
-                  <span className="font-semibold">
-                    {(running ? liveMbps : result?.mbps || 0).toFixed(2)} Mbps
+  return (
+    <Card className="!p-0 overflow-hidden">
+      <div className="relative p-4 md:p-5 rounded-2xl bg-gradient-to-br from-sky-500/25 via-indigo-500/15 to-fuchsia-500/25 border border-white/10">
+        {/* glow background */}
+        <div className="pointer-events-none absolute -top-32 -right-10 w-64 h-64 bg-sky-400/30 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-40 -left-10 w-72 h-72 bg-purple-500/30 blur-3xl" />
+
+        <div className="relative grid gap-4 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+          {/* left: main speed indicator */}
+          <div className="flex flex-col justify-between gap-4">
+            <div className="flex items-center justify-between text-[11px] text-slate-100/80">
+              <div className="flex items-center gap-2">
+                <span className="px-2 py-0.5 rounded-full border border-white/15 bg-slate-950/40">
+                  Speed test
+                </span>
+                {running && (
+                  <span className="inline-flex items-center gap-1 text-sky-100">
+                    <span className="w-2 h-2 rounded-full bg-sky-400 animate-pulse" />
+                    Live
                   </span>
+                )}
+              </div>
+              {result && !running && (
+                <span className="text-slate-200">
+                  Last:{" "}
+                  <span className="font-semibold">{displayMbps} Mbps</span>
                 </span>
-                <span className="text-slate-500">•</span>
-                <span>
-                  Data: {formatBytes(running ? liveBytes : result?.bytes || 0)}{" "}
-                  / {(running ? liveSeconds : result?.seconds || 0).toFixed(2)}s
+              )}
+            </div>
+
+            <div className="flex flex-col items-center justify-center py-2">
+              <div className="text-[11px] uppercase tracking-[0.2em] text-slate-200/80 mb-1">
+                DOWNLOAD
+              </div>
+              <div className="flex items-end gap-2">
+                <span className="text-4xl md:text-5xl font-semibold tracking-tight text-slate-50 drop-shadow-[0_0_12px_rgba(15,23,42,0.8)]">
+                  {displayMbps}
                 </span>
+                <span className="pb-1 text-xs text-slate-200/80">Mbps</span>
+              </div>
+              <div className="mt-2 text-[11px] text-slate-200/80">
+                {displayBytes} • {displaySeconds}s
+              </div>
+            </div>
+
+            {(running || liveBytes > 0) && (
+              <div className="space-y-1">
+                <div className="h-1.5 rounded-full bg-slate-900/70 overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-sky-400 via-cyan-300 to-fuchsia-400 transition-[width] duration-150"
+                    style={{ width: `${progress ?? 100}%` }}
+                  />
+                </div>
+                <div className="flex justify-between text-[10px] text-slate-200/80">
+                  <span>{formatBytes(liveBytes)} downloaded</span>
+                  {progress != null && <span>{Math.round(progress)}%</span>}
+                </div>
+              </div>
+            )}
+
+            <div className="flex items-center gap-2 mt-1">
+              <Button size="sm" onClick={handleRun} disabled={running}>
+                {running ? "Testing..." : "Run speed test"}
+              </Button>
+              <div className="flex-1 text-[10px] text-slate-200/80">
+                Gunakan URL file yang cukup besar dan mengizinkan CORS. Trafik
+                akan melewati jalur Sing-box saat browser ini menggunakan proxy.
+              </div>
+            </div>
+          </div>
+
+          {/* right: URL + IP/ISP */}
+          <div className="space-y-3 text-xs">
+            <div className="space-y-1">
+              <div className="text-[11px] text-slate-100/80">Test URL</div>
+              <input
+                className="w-full rounded-2xl bg-slate-950/50 border border-white/15 px-3 py-2 text-[11px] outline-none focus:border-sky-400 text-slate-100 placeholder:text-slate-400"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                placeholder="https://example.com/large-file.bin"
+              />
+            </div>
+
+            <div className="rounded-2xl border border-white/10 bg-slate-950/40 px-3 py-2 space-y-1">
+              <div className="text-[11px] text-slate-200/90 mb-0.5">
+                IP &amp; ISP
+              </div>
+              {ipInfo ? (
+                <>
+                  <div className="text-[11px] text-slate-50">
+                    {ipInfo.ip} •{" "}
+                    {ipInfo.org || ipInfo.org_name || "Unknown ISP"}
+                  </div>
+                  <div className="text-[10px] text-slate-300">
+                    {ipInfo.city}, {ipInfo.region}
+                    {", "}
+                    {ipInfo.country_name} • {ipInfo.asn || ipInfo.country}
+                  </div>
+                </>
+              ) : ipError ? (
+                <div className="text-[10px] text-rose-300">{ipError}</div>
+              ) : (
+                <div className="text-[10px] text-slate-400">
+                  Memuat info IP...
+                </div>
+              )}
+            </div>
+
+            {error && (
+              <div className="text-[11px] text-rose-200 bg-rose-950/40 border border-rose-700/60 rounded-2xl px-3 py-2">
+                {error}
               </div>
             )}
           </div>
-
-          {/* indikator progres sederhana */}
-          {(running || liveBytes > 0) && (
-            <div className="space-y-1">
-              <div className="h-1.5 rounded-full bg-slate-800/80 overflow-hidden">
-                <div
-                  className="h-full bg-sky-500 transition-[width] duration-150"
-                  style={{ width: `${progress ?? 100}%` }}
-                />
-              </div>
-              <div className="flex justify-between text-[10px] text-slate-500">
-                <span>{formatBytes(liveBytes)} downloaded</span>
-                {progress != null && (
-                  <span>{Math.round(progress)}%</span>
-                )}
-              </div>
-            </div>
-          )}
         </div>
-
-        {/* Info IP / ISP / lokasi */}
-        <div className="border border-slate-800/80 rounded-2xl px-3 py-2 bg-slate-950/40 space-y-1">
-          <div className="text-[11px] text-slate-400 mb-0.5">
-            IP &amp; ISP (via ipapi.co)
-          </div>
-          {ipInfo ? (
-            <>
-              <div className="text-[11px] text-slate-200">
-                {ipInfo.ip} • {ipInfo.org || ipInfo.org_name || "Unknown ISP"}
-              </div>
-              <div className="text-[10px] text-slate-400">
-                {ipInfo.city}, {ipInfo.region}{", "}
-                {ipInfo.country_name} • {ipInfo.asn || ipInfo.country}
-              </div>
-            </>
-          ) : ipError ? (
-            <div className="text-[10px] text-rose-300">{ipError}</div>
-          ) : (
-            <div className="text-[10px] text-slate-500">Memuat info IP...</div>
-          )}
-        </div>
-
-        {error && (
-          <div className="text-[11px] text-rose-300 bg-rose-950/40 border border-rose-700/60 rounded-2xl px-3 py-2">
-            {error}
-          </div>
-        )}
       </div>
     </Card>
   );
