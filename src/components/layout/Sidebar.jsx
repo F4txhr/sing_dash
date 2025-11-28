@@ -2,11 +2,14 @@ import { NAV_ITEMS } from "../../lib/navConfig";
 import { THEMES } from "../../lib/themes";
 import { useTheme } from "../../lib/themeContext";
 import { useConnectionStatus } from "../../lib/connectionStatus";
+import { useLayout } from "../../lib/layoutContext";
+import { LAYOUTS } from "../../lib/layouts";
 
 export default function Sidebar({ activePage, onChangePage }) {
   const { themeId, setThemeId } = useTheme();
   const theme = THEMES[themeId];
   const { status } = useConnectionStatus();
+  const { layoutId, setLayoutId } = useLayout();
 
   return (
     <aside className="hidden md:flex flex-col w-64 px-4 py-4 gap-4">
@@ -56,6 +59,20 @@ export default function Sidebar({ activePage, onChangePage }) {
               {Object.values(THEMES).map((t) => (
                 <option key={t.id} value={t.id}>
                   {t.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="flex items-center justify-between gap-2">
+            <span>Layout</span>
+            <select
+              className="rounded-2xl bg-slate-950/60 border border-slate-700/80 px-2 py-1 text-[11px] outline-none focus:border-sky-500"
+              value={layoutId}
+              onChange={(e) => setLayoutId(e.target.value)}
+            >
+              {Object.values(LAYOUTS).map((l) => (
+                <option key={l.id} value={l.id}>
+                  {l.name}
                 </option>
               ))}
             </select>

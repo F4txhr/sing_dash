@@ -3,10 +3,13 @@ import { NAV_ITEMS } from "../../lib/navConfig";
 import { useTheme } from "../../lib/themeContext";
 import { THEMES } from "../../lib/themes";
 import { useConnectionStatus } from "../../lib/connectionStatus";
+import { useLayout } from "../../lib/layoutContext";
+import { LAYOUTS } from "../../lib/layouts";
 
 export default function AppLayout({ children, activePage, onChangePage }) {
   const { themeId, theme, setThemeId } = useTheme();
   const { status } = useConnectionStatus();
+  const { layoutId, setLayoutId } = useLayout();
 
   const themeList = Object.values(THEMES);
   const currentIndex = themeList.findIndex((t) => t.id === themeId);
@@ -17,14 +20,95 @@ export default function AppLayout({ children, activePage, onChangePage }) {
     setThemeId(nextThemeId);
   };
 
+  if (layoutId === "topbar") {
+    return (
+      <div className="relative z-10 flex min-h-screen">
+        <div className="flex-1 flex flex-col">
+          <header className="px-4 pt-4 pb-2 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+            <div className="flex items-center gap-2">
+              <div className="text-sm font-semibold tracking-tight">
+                Vortex-x <span className="text-sky-400">Dashboard</span>
+              </div>
+            </div>
+            <div className="flex flex-wrap items-center gap-2 justify-end text-[11px]">
+              <div className="flex flex-wrap items-center gap-1">
+                {NAV_ITEMS.map((item) => {
+                  const active = item.key === activePage;
+                  return (
+                    <button
+                      key={item.key}
+                      onClick={() => onChangePage(item.key)}
+                      className={`px-3 py-1 rounded-2xl border text-[11px] transition ${
+                        active
+                          ? "border-sky-400 bg-sky-500/20 text-sky-100"
+                          : "border-transparent text-slate-300 hover:text-sky-100 hover:bg-slate-800/70"
+                      }`}
+                    >
+                      {item.label}
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="flex items-center gap-1 text-[10px]">
+                <span
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    status === "ok"
+                      ? "bg-emerald-400"
+                      : status === "error"
+                      ? "bg-rose-400"
+                      : "bg-slate-500"
+                  }`}
+                />
+                <span className="text-slate-400">
+                  API:{" "}
+                  {status === "ok"
+                    ? "Online"
+                    : status === "error"
+                    ? "Error"
+                    : "Unknown"}
+                </span>
+              </div>
+              <div className="flex items-center gap-1 text-[10px]">
+                <span className="text-slate-400">Layout:</span>
+                <select
+                  className="rounded-2xl bg-slate-950/70 border border-slate-700/80 px-2 py-1 outline-none"
+                  value={layoutId}
+                  onChange={(e) => setLayoutId(e.target.value)}
+                >
+                  {Object.values(LAYOUTS).map((l) => (
+                    <option key={l.id} value={l.id}>
+                      {l.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <button
+                type="button"
+                onClick={handleCycleTheme}
+                className="text-[10px] px-2 py-1 rounded-2xl border border-slate-700/80 bg-slate-950/70 text-slate-200"
+                title="Switch theme"
+              >
+                Theme
+              </button>
+            </div>
+          </header>
+
+          <main className="flex-1 px-4 md:px-6 py-4 md:py-6 max-w-5xl mx-auto w-full overflow-y-auto">
+            {children}
+          </main>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="relative z-10 flex min-h-screen">
-      {/* Sidebar: hanya tampil di md+ */}
+      {/* Sidebar (desktop) */}
       <Sidebar activePage={activePage} onChangePage={onChangePage} />
 
-      {/* Area kanan: konten + topbar + bottom nav */}
+      {/* Right area: content + mobile topbar + bottom nav */}
       <div className="flex-1 flex flex-col">
-        {/* Topbar khusus mobile */}
+        {/* Mobile topbar */}
         <header className="md:hidden px-4 pt-4 pb-2 flex items-center justify-between gap-3">
           <div>
             <div className="text-sm font-semibold tracking-tight">
@@ -67,16 +151,16 @@ export default function AppLayout({ children, activePage, onChangePage }) {
             className="text-[10px] px-2 py-1 rounded-2xl border border-slate-700/80 bg-slate-950/70 text-slate-200"
             title="Switch theme"
           >
-            Switch
+            Theme
           </button>
         </header>
 
-        {/* Konten utama */}
+        {/* Main content */}
         <main className="flex-1 px-4 md:px-6 py-4 md:py-6 max-w-5xl mx-auto w-full overflow-y-auto">
           {children}
         </main>
 
-        {/* Bottom nav khusus mobile */}
+        {/* Bottom nav (mobile) */}
         <nav className="md:hidden sticky bottom-0 left-0 right-0 z-20">
           <div
             className={`mx-3 mb-3 rounded-3xl px-2 py-1.5 shadow-soft flex justify-between ${
