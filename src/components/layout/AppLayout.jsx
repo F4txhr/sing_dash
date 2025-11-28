@@ -4,12 +4,11 @@ import { useTheme } from "../../lib/themeContext";
 import { THEMES } from "../../lib/themes";
 import { useConnectionStatus } from "../../lib/connectionStatus";
 import { useLayout } from "../../lib/layoutContext";
-import { LAYOUTS } from "../../lib/layouts";
 
 export default function AppLayout({ children, activePage, onChangePage }) {
   const { themeId, theme, setThemeId } = useTheme();
   const { status } = useConnectionStatus();
-  const { layoutId, setLayoutId } = useLayout();
+  const { layoutId } = useLayout();
 
   const themeList = Object.values(THEMES);
   const currentIndex = themeList.findIndex((t) => t.id === themeId);
@@ -67,20 +66,6 @@ export default function AppLayout({ children, activePage, onChangePage }) {
                     ? "Error"
                     : "Unknown"}
                 </span>
-              </div>
-              <div className="flex items-center gap-1 text-[10px]">
-                <span className="text-slate-400">Layout:</span>
-                <select
-                  className="rounded-2xl bg-slate-950/70 border border-slate-700/80 px-2 py-1 outline-none"
-                  value={layoutId}
-                  onChange={(e) => setLayoutId(e.target.value)}
-                >
-                  {Object.values(LAYOUTS).map((l) => (
-                    <option key={l.id} value={l.id}>
-                      {l.name}
-                    </option>
-                  ))}
-                </select>
               </div>
               <button
                 type="button"

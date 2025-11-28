@@ -5,13 +5,16 @@ import "./index.css";
 import { ThemeProvider } from "./lib/themeContext";
 import { ConnectionProvider } from "./lib/connectionStatus";
 import { LayoutProvider } from "./lib/layoutContext";
+import { IconProvider } from "./lib/iconContext";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <ConnectionProvider>
       <LayoutProvider>
         <ThemeProvider>
-          <App />
+          <IconProvider>
+            <App />
+          </IconProvider>
         </ThemeProvider>
       </LayoutProvider>
     </ConnectionProvider>

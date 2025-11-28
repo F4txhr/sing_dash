@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 
 import AppLayout from "./components/layout/AppLayout";
+import { useTheme } from "./lib/themeContext";
 
 import Overview from "./pages/Overview";
 import Proxies from "./pages/Proxies";
 import Rules from "./pages/Rules";
 import Conns from "./pages/Conns";
-import ConfigPage from "./pages/ConfigPage";
+import SettingsPage from "./pages/Settings";
 import Logs from "./pages/Logs";
 import Profiles from "./pages/Profiles";
 
@@ -15,7 +16,7 @@ const PAGES = [
   "proxies",
   "rules",
   "conns",
-  "config",
+  "settings",
   "logs",
   "profiles"
 ];
@@ -29,6 +30,7 @@ function getInitialPage() {
 
 export default function App() {
   const [page, setPage] = useState(getInitialPage);
+  const { theme } = useTheme();
 
   const handleChangePage = (nextPage) => {
     setPage(nextPage);
@@ -47,35 +49,34 @@ export default function App() {
   const renderPage = () => {
     switch (page) {
       case "proxies":
-        return <Proxies />;
+        return &lt;Proxies /&gt;;
       case "rules":
-        return <Rules />;
+        return &lt;Rules /&gt;;
       case "conns":
-        return <Conns />;
-      case "config":
-        return <ConfigPage />;
+        return &lt;Conns /&gt;;
+      case "settings":
+        return &lt;SettingsPage /&gt;;
       case "logs":
-        return <Logs />;
+        return &lt;Logs /&gt;;
       case "profiles":
-        return <Profiles />;
+        return &lt;Profiles /&gt;;
       case "overview":
       default:
-        return <Overview />;
+        return &lt;Overview /&gt;;
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 relative overflow-hidden">
+    &lt;div className={`min-h-screen text-slate-100 relative overflow-hidden ${theme.background || ""}`}&gt;
       {/* blur / glow background */}
-      <div className="pointer-events-none fixed inset-0">
-        <div className="absolute -top-40 -left-40 w-96 h-96 bg-sky-500/20 blur-3xl rounded-full" />
-        <div className="absolute -bottom-40 -right-40 w-[28rem] h-[28rem] bg-emerald-500/15 blur-3xl rounded-full" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_#0f172a,_#020617)] opacity-80" />
-      </div>
+      &lt;div className="pointer-events-none fixed inset-0"&gt;
+        &lt;div className="absolute -top-40 -left-40 w-96 h-96 bg-sky-500/20 blur-3xl rounded-full" /&gt;
+        &lt;div className="absolute -bottom-40 -right-40 w-[28rem] h-[28rem] bg-emerald-500/15 blur-3xl rounded-full" /&gt;
+      &lt;/div&gt;
 
-      <AppLayout activePage={page} onChangePage={handleChangePage}>
+      &lt;AppLayout activePage={page} onChangePage={handleChangePage}&gt;
         {renderPage()}
-      </AppLayout>
-    </div>
+      &lt;/AppLayout&gt;
+    &lt;/div&gt;
   );
 }
