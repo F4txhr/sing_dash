@@ -143,8 +143,10 @@ export default function AppLayout({ children, activePage, onChangePage }) {
         </header>
 
         {/* Main content */}
-       <<main className="flex-1 px-3 sm:px-4 md:px-6 lg:px-8 py-4 md:py-6 max-w-4xl sm:max-w-5xl lg:max-w-6xl 2xl:max-w-7xl mx-auto w-full overflow-y-auto">
-          {children}
+        <main className="flex-1 px-3 sm:px-4 md:px-6 lg:px-8 py-4 md:py-6 max-w-4xl sm:max-w-5xl lg:max-w-6xl 2xl:max-w-7xl mx-auto w-full overflow-y-auto">
+          <div key={activePage} className="page-transition">
+            {children}
+          </div>
         </main>
 
         {/* Bottom nav (mobile) */}
