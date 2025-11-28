@@ -12,7 +12,6 @@ export default function TrafficChart({ history }) {
   return (
     <Card
       title="Traffic"
-      description="Grafik sederhana dari /traffic (Up / Down) dalam beberapa detik terakhir."
       className="lg:col-span-2"
     >
       <div className="flex flex-col gap-2 h-40 md:h-56">
