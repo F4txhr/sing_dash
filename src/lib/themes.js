@@ -47,14 +47,15 @@ export const THEMES = {
   },
   aurora: {
     id: "aurora",
-    name: "Aurora",
+    name: "Aurora Glass",
     card:
-      "rounded-2xl bg-slate-900/80 border border-emerald-300/50 shadow-[0_0_40px_-18px_rgba(45,212,191,0.8)] backdrop-blur-xl",
+      "rounded-2xl bg-white/8 backdrop-blur-xl border border-emerald-300/50 shadow-[0_0_40px_-18px_rgba(45,212,191,0.8)]",
     sidebar:
-      "bg-slate-900/80 border border-emerald-300/50 shadow-[0_0_40px_-18px_rgba(45,212,191,0.8)] backdrop-blur-xl",
+      "bg-white/10 backdrop-blur-xl border border-emerald-300/50 shadow-[0_0_40px_-18px_rgba(45,212,191,0.8)]",
     bottomNav:
-      "border border-emerald-300/50 bg-slate-950/90 shadow-[0_0_40px_-20px_rgba(45,212,191,0.9)] backdrop-blur-xl",
-    background: "bg-slate-950 bg-aurora-anim",
+      "border border-emerald-300/50 bg-slate-950/80 backdrop-blur-xl shadow-[0_0_40px_-20px_rgba(45,212,191,0.9)]",
+    background:
+      "bg-slate-950 bg-[radial-gradient(circle_at_bottom,_#22c55e26,_#020617)]",
     latencyDisplay: "number"
   },
   sunset: {
@@ -84,26 +85,26 @@ export const THEMES = {
   },
   pastel: {
     id: "pastel",
-    name: "Pastel",
+    name: "Pastel Glass",
     card:
-      "rounded-2xl bg-slate-900/90 border border-sky-300/40 shadow-[0_0_24px_-12px_rgba(125,211,252,0.7)]",
+      "rounded-2xl bg-white/8 backdrop-blur-xl border border-sky-200/40 shadow-[0_0_24px_-12px_rgba(125,211,252,0.7)]",
     sidebar:
-      "bg-slate-950/95 border border-sky-300/40 shadow-[0_0_30px_-14px_rgba(125,211,252,0.7)]",
+      "bg-white/10 backdrop-blur-xl border border-sky-200/40 shadow-[0_0_30px_-14px_rgba(125,211,252,0.7)]",
     bottomNav:
-      "border border-sky-300/40 bg-slate-950/95 shadow-[0_0_24px_-12px_rgba(125,211,252,0.7)]",
+      "border border-sky-200/40 bg-slate-950/80 backdrop-blur-xl shadow-[0_0_24px_-12px_rgba(125,211,252,0.7)]",
     background:
       "bg-slate-950 bg-[radial-gradient(circle_at_top,_#38bdf81f,_#020617)]",
     latencyDisplay: "number"
   },
   ocean: {
     id: "ocean",
-    name: "Ocean",
+    name: "Ocean Glass",
     card:
-      "rounded-2xl bg-slate-950/90 border border-cyan-400/40 shadow-[0_0_32px_-16px_rgba(34,211,238,0.8)]",
+      "rounded-2xl bg-white/8 backdrop-blur-xl border border-cyan-300/40 shadow-[0_0_32px_-16px_rgba(34,211,238,0.8)]",
     sidebar:
-      "bg-slate-950/95 border border-cyan-400/40 shadow-[0_0_40px_-18px_rgba(34,211,238,0.8)]",
+      "bg-white/10 backdrop-blur-xl border border-cyan-300/40 shadow-[0_0_40px_-18px_rgba(34,211,238,0.8)]",
     bottomNav:
-      "border border-cyan-400/40 bg-slate-950/95 shadow-[0_0_32px_-18px_rgba(34,211,238,0.8)]",
+      "border border-cyan-300/40 bg-slate-950/80 backdrop-blur-xl shadow-[0_0_32px_-18px_rgba(34,211,238,0.8)]",
     background:
       "bg-slate-950 bg-[radial-gradient(circle_at_bottom,_#22d3ee3d,_#020617)]",
     latencyDisplay: "number"

@@ -131,3 +131,73 @@ body {
   height: 100%;
   transition: opacity 3s ease;
 }
+
+.stars-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.star-dot {
+  position: absolute;
+  top: -10vh;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.8);
+  filter: blur(1px);
+  animation-name: starFall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes starFall {
+  0% {
+    transform: translate3d(0, -10vh, 0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(0, 115vh, 0);
+    opacity: 0;
+  }
+}
+
+.lines-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.line-segment {
+  position: absolute;
+  background: linear-gradient(
+    to right,
+    rgba(148, 163, 184, 0.1),
+    rgba(148, 163, 184, 0.7),
+    rgba(148, 163, 184, 0.1)
+  );
+  border-radius: 9999px;
+  animation-name: lineDrift;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+@keyframes lineDrift {
+  0% {
+    transform: translate3d(-10px, 0, 0) rotate(var(--line-angle, 0deg));
+    opacity: 0.3;
+  }
+  50% {
+    transform: translate3d(10px, 0, 0) rotate(var(--line-angle, 0deg));
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate3d(-10px, 0, 0) rotate(var(--line-angle, 0deg));
+    opacity: 0.3;
+  }
+}

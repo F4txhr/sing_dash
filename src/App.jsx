@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import AppLayout from "./components/layout/AppLayout";
 import { useTheme } from "./lib/themeContext";
 import TrianglesBackground from "./components/layout/TrianglesBackground";
+import StarsBackground from "./components/layout/StarsBackground";
+import LinesBackground from "./components/layout/LinesBackground";
 
 import Overview from "./pages/Overview";
 import Proxies from "./pages/Proxies";
@@ -85,6 +87,9 @@ export default function App() {
         // geometric animated background behind content
         <TrianglesBackground />
       )}
+
+      {themeId === "pastel" && <StarsBackground />}
+      {themeId === "ocean" && <LinesBackground />}
 
       <AppLayout activePage={page} onChangePage={handleChangePage}>
         {renderPage()}
