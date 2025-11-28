@@ -77,9 +77,9 @@ function getLatencyColor(val, themeId) {
   if (val === "error" || val === null || val === undefined)
     return "text-slate-500";
   const palette = getLatencyPalette(themeId);
-  if (val &lt; 80) return palette.text[0];
-  if (val &lt; 150) return palette.text[1];
-  if (val &lt; 250) return palette.text[2];
+  if (val < 80) return palette.text[0];
+  if (val < 150) return palette.text[1];
+  if (val < 250) return palette.text[2];
   return palette.text[3];
 }
 
@@ -87,9 +87,9 @@ function qualityDotClass(val, themeId) {
   if (val === "error" || val === null || val === undefined)
     return "bg-slate-500";
   const palette = getLatencyPalette(themeId);
-  if (val &lt; 80) return palette.bg[0];
-  if (val &lt; 150) return palette.bg[1];
-  if (val &lt; 250) return palette.bg[2];
+  if (val < 80) return palette.bg[0];
+  if (val < 150) return palette.bg[1];
+  if (val < 250) return palette.bg[2];
   return palette.bg[3];
 }
 
