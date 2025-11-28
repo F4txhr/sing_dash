@@ -28,19 +28,28 @@ function extractLatencyMap(proxiesObj) {
 function getLatencyColor(val) {
   if (val === "error" || val === null || val === undefined)
     return "text-slate-500";
-  if (val < 80) return "text-emerald-400";
-  if (val < 150) return "text-lime-300";
-  if (val < 250) return "text-yellow-300";
+  if (val &lt; 80) return "text-emerald-400";
+  if (val &lt; 150) return "text-lime-300";
+  if (val &lt; 250) return "text-yellow-300";
   return "text-rose-400";
 }
 
 function qualityDotClass(val) {
   if (val === "error" || val === null || val === undefined)
     return "bg-slate-500";
-  if (val < 80) return "bg-emerald-400";
-  if (val < 150) return "bg-lime-300";
-  if (val < 250) return "bg-yellow-300";
+  if (val &lt; 80) return "bg-emerald-400";
+  if (val &lt; 150) return "bg-lime-300";
+  if (val &lt; 250) return "bg-yellow-300";
   return "bg-rose-400";
+}
+
+function latencyQualityLabel(val) {
+  if (val === "error") return "Error";
+  if (val === null || val === undefined) return "Unknown";
+  if (val &lt; 80) return "Excellent";
+  if (val &lt; 150) return "Good";
+  if (val &lt; 250) return "Fair";
+  return "Poor";
 }
 
 export default function Proxies() {
@@ -160,10 +169,22 @@ export default function Proxies() {
   );
 
   const searchLower = search.trim().toLowerCase();
-  const entries = entriesRaw.filter(([name, proxy]) => {
+  const filteredEntries = entriesRaw.filter(([name, proxy]) => {
     if (!searchLower) return true;
     if (name.toLowerCase().includes(searchLower)) return true;
     return proxy.all.some((p) => p.toLowerCase().includes(searchLower));
+  });
+
+  // urutkan group berdasarkan latency proxy aktif (paling cepat di atas)
+  const entries = filteredEntries.sort(([nameA, proxyA], [nameB, proxyB]) => {
+    const latA = latency[proxyA.now];
+    const latB = latency[proxyB.now];
+    const a = typeof latA === "number" ? latA : Number.POSITIVE_INFINITY;
+    const b = typeof latB === "number" ? latB : Number.POSITIVE_INFINITY;
+    if (a === b) {
+      return nameA.localeCompare(nameB);
+    }
+    return a - b;
   });
 
   return (
@@ -305,6 +326,9 @@ export default function Proxies() {
                       : currentLatency == null
                       ? "-"
                       : `${currentLatency} ms`}
+                  </span>
+                  <span className="text-[10px] text-slate-400">
+                    {latencyQualityLabel(currentLatency)}
                   </span>
                 </div>
 
