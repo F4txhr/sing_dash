@@ -49,34 +49,38 @@ export default function App() {
   const renderPage = () => {
     switch (page) {
       case "proxies":
-        return &lt;Proxies /&gt;;
+        return <Proxies />;
       case "rules":
-        return &lt;Rules /&gt;;
+        return <Rules />;
       case "conns":
-        return &lt;Conns /&gt;;
+        return <Conns />;
       case "settings":
-        return &lt;SettingsPage /&gt;;
+        return <SettingsPage />;
       case "logs":
-        return &lt;Logs /&gt;;
+        return <Logs />;
       case "profiles":
-        return &lt;Profiles /&gt;;
+        return <Profiles />;
       case "overview":
       default:
-        return &lt;Overview /&gt;;
+        return <Overview />;
     }
   };
 
   return (
-    &lt;div className={`min-h-screen text-slate-100 relative overflow-hidden ${theme.background || ""}`}&gt;
+    <div
+      className={`min-h-screen text-slate-100 relative overflow-hidden ${
+        theme.background || ""
+      }`}
+    >
       {/* blur / glow background */}
-      &lt;div className="pointer-events-none fixed inset-0"&gt;
-        &lt;div className="absolute -top-40 -left-40 w-96 h-96 bg-sky-500/20 blur-3xl rounded-full" /&gt;
-        &lt;div className="absolute -bottom-40 -right-40 w-[28rem] h-[28rem] bg-emerald-500/15 blur-3xl rounded-full" /&gt;
-      &lt;/div&gt;
+      <div className="pointer-events-none fixed inset-0">
+        <div className="absolute -top-40 -left-40 w-96 h-96 bg-sky-500/20 blur-3xl rounded-full" />
+        <div className="absolute -bottom-40 -right-40 w-[28rem] h-[28rem] bg-emerald-500/15 blur-3xl rounded-full" />
+      </div>
 
-      &lt;AppLayout activePage={page} onChangePage={handleChangePage}&gt;
+      <AppLayout activePage={page} onChangePage={handleChangePage}>
         {renderPage()}
-      &lt;/AppLayout&gt;
-    &lt;/div&gt;
+      </AppLayout>
+    </div>
   );
 }
