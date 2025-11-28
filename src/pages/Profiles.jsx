@@ -109,15 +109,9 @@ export default function Profiles() {
     <div className="space-y-4">
       {/* page header */}
       <header className="flex items-center justify-between gap-2">
-        <div>
-          <h1 className="text-lg md:text-xl font-semibold tracking-tight">
-            Profiles
-          </h1>
-          <p className="text-xs text-slate-400">
-            Save and manage Sing-box configuration snapshots (configs + proxies)
-            locally in the browser.
-          </p>
-        </div>
+        <h1 className="text-lg md:text-xl font-semibold tracking-tight">
+          Profiles
+        </h1>
       </header>
 
       {(msg || err) && (
@@ -138,7 +132,6 @@ export default function Profiles() {
       {/* snapshot card */}
       <Card
         title="Create snapshot"
-        description="Capture current configs + proxies and save as a local profile."
       >
         <div className="space-y-3 text-xs">
           <div className="grid gap-3 md:grid-cols-2">

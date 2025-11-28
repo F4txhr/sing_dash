@@ -43,14 +43,9 @@ export default function Conns() {
   return (
     <div className="space-y-4">
       <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-        <div>
-          <h1 className="text-lg md:text-xl font-semibold tracking-tight">
-            Connections
-          </h1>
-          <p className="text-xs text-slate-400">
-            Active connections from /connections.
-          </p>
-        </div>
+        <h1 className="text-lg md:text-xl font-semibold tracking-tight">
+          Connections
+        </h1>
         <div className="flex items-center gap-2">
           <div className="hidden md:flex items-center gap-1 text-[11px] text-slate-400">
             <span>Auto-refresh:</span>
@@ -87,7 +82,6 @@ export default function Conns() {
 
       <Card
         title="Connections"
-        description="List of active connections going through Sing-box."
       >
         <div className="hidden md:grid grid-cols-[minmax(0,1.8fr)_minmax(0,0.6fr)_minmax(0,1fr)_minmax(0,0.8fr)] gap-2 text-[11px] text-slate-400 mb-2 px-1">
           <div>Host</div>

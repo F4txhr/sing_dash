@@ -202,31 +202,26 @@ export default function Overview() {
 
   return (
     <div className="space-y-4">
-      {/* Header halaman */}
+      {/* Page header */}
       <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <h1 className="text-lg md:text-xl font-semibold tracking-tight">
-              Overview
-            </h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-lg md:text-xl font-semibold tracking-tight">
+            Overview
+          </h1>
+          <span
+            className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] border ${
+              isConnected
+                ? "border-emerald-400/60 text-emerald-300 bg-emerald-500/10"
+                : "border-rose-400/60 text-rose-300 bg-rose-500/10"
+            }`}
+          >
             <span
-              className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] border ${
-                isConnected
-                  ? "border-emerald-400/60 text-emerald-300 bg-emerald-500/10"
-                  : "border-rose-400/60 text-rose-300 bg-rose-500/10"
+              className={`w-1.5 h-1.5 rounded-full ${
+                isConnected ? "bg-emerald-400" : "bg-rose-400"
               }`}
-            >
-              <span
-                className={`w-1.5 h-1.5 rounded-full ${
-                  isConnected ? "bg-emerald-400" : "bg-rose-400"
-                }`}
-              />
-              {isConnected ? "Connected" : "Disconnected"}
-            </span>
-          </div>
-          <p className="text-xs text-slate-400">
-            Traffic and connection summary (Sing-box / Clash compatible).
-          </p>
+            />
+            {isConnected ? "Connected" : "Disconnected"}
+          </span>
         </div>
 
         <div className="flex items-center gap-2">
@@ -295,24 +290,15 @@ export default function Overview() {
         {/* Upload total (from local calculation or backend, if available) */}
         <Card title="Upload total" className="!p-3 md:!p-4">
           <div className="text-sm font-semibold">{formatBytes(upTotal)}</div>
-          <div className="text-[11px] text-slate-400 mt-0.5">
-            Estimated upload since this page was opened
-          </div>
         </Card>
 
         {/* Download total */}
         <Card title="Download total" className="!p-3 md:!p-4">
           <div className="text-sm font-semibold">{formatBytes(downTotal)}</div>
-          <div className="text-[11px] text-slate-400 mt-0.5">
-            Estimated download since this page was opened
-          </div>
         </Card>
 
         <Card title="Active connections" className="!p-3 md:!p-4">
           <div className="text-sm font-semibold">{activeConns}</div>
-          <div className="text-[11px] text-slate-400 mt-0.5">
-            From /connections
-          </div>
         </Card>
       </div>
 

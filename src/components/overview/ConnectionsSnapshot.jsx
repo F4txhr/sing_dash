@@ -3,10 +3,7 @@ import { formatBytes } from "../../lib/utils";
 
 export default function ConnectionsSnapshot({ conns }) {
   return (
-    <Card
-      title="Connections snapshot"
-      description="Beberapa host dari /connections."
-    >
+    <Card title="Connections snapshot">
       <div className="space-y-1 max-h-56 overflow-y-auto text-[11px]">
         {conns && conns.length > 0 ? (
           conns.slice(0, 10).map((c, idx) => (
@@ -34,7 +31,7 @@ export default function ConnectionsSnapshot({ conns }) {
             </div>
           ))
         ) : (
-          <div className="text-slate-500">Belum ada koneksi aktif.</div>
+          <div className="text-slate-500">No active connections.</div>
         )}
       </div>
     </Card>

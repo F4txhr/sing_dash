@@ -76,14 +76,9 @@ export default function ConfigPage() {
   return (
     <div className="space-y-4">
       <header className="flex items-center justify-between gap-2">
-        <div>
-          <h1 className="text-lg md:text-xl font-semibold tracking-tight">
-            Config
-          </h1>
-          <p className="text-xs text-slate-400">
-            API settings and selected /configs fields.
-          </p>
-        </div>
+        <h1 className="text-lg md:text-xl font-semibold tracking-tight">
+          Config
+        </h1>
         <Button size="sm" onClick={loadCfg} disabled={loading}>
           {loading ? "Loading..." : "Reload /configs"}
         </Button>
@@ -98,7 +93,6 @@ export default function ConfigPage() {
       <div className="grid gap-4 md:grid-cols-2">
         <Card
           title="API Settings"
-          description="Base URL & secret Clash API (Sing-box)."
         >
           <div className="space-y-3 text-xs">
             <div className="space-y-1">
@@ -139,7 +133,6 @@ export default function ConfigPage() {
 
         <Card
           title="Runtime Config"
-          description="Mode & log level dari /configs."
         >
           {cfg ? (
             <div className="space-y-3 text-xs">

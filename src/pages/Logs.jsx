@@ -106,14 +106,9 @@ export default function Logs() {
   return (
     <div className="space-y-4">
       <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-        <div>
-          <h1 className="text-lg md:text-xl font-semibold tracking-tight">
-            Logs
-          </h1>
-          <p className="text-xs text-slate-400">
-            Log realtime dari /logs (WebSocket).
-          </p>
-        </div>
+        <h1 className="text-lg md:text-xl font-semibold tracking-tight">
+          Logs
+        </h1>
         <div className="flex flex-wrap items-center gap-2 justify-end">
           <div className="flex items-center gap-2">
             <select

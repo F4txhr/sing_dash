@@ -179,14 +179,9 @@ export default function Proxies() {
     <div className="space-y-4">
       {/* page header */}
       <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-        <div>
-          <h1 className="text-lg md:text-xl font-semibold tracking-tight">
-            Proxies
-          </h1>
-          <p className="text-xs text-slate-400">
-            Group selection and latency monitor from /proxies.
-          </p>
-        </div>
+        <h1 className="text-lg md:text-xl font-semibold tracking-tight">
+          Proxies
+        </h1>
 
         <div className="flex flex-wrap items-center gap-2 justify-between md:justify-end">
           {/* view mode toggle */}
