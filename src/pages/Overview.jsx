@@ -5,6 +5,7 @@ import TrafficChart from "../components/overview/TrafficChart";
 import ConnectionsSnapshot from "../components/overview/ConnectionsSnapshot";
 import { getConnections, connectTraffic } from "../lib/clashApi";
 import { formatBytes, formatSpeed } from "../lib/utils";
+import { useConnectionStatus } from "../lib/connectionStatus";
 
 export default function Overview() {
   const [traffic, setTraffic] = useState(null);
@@ -14,6 +15,7 @@ export default function Overview() {
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [intervalSec, setIntervalSec] = useState(5);
   const [tick, setTick] = useState(0); // indikator kecil di UI
+  const { setConnectionStatus } = useConnectionStatus();
 
   // total hasil kalkulasi lokal (menjumlah dari up/down)
   const [calcTotal, setCalcTotal] = useState({ up: 0, down: 0 });
@@ -33,7 +35,9 @@ export default function Overview() {
       ws.onopen = () => {
         console.log("[Overview] traffic WS opened");
         setErr((e) => (e.startsWith("traffic") ? "" : e));
-      };
+        setConnectionStatus({
+          status: "ok",
+         ;
 
       ws.onmessage = (evt) => {
         try {
@@ -87,6 +91,11 @@ export default function Overview() {
         setErr(
           (prev) => prev || "traffic websocket error (lihat console browser)",
         );
+        setConnectionStatus({
+          status: "error",
+          lastError: e?.message || "traffic websocket error",
+          lastChecked: new Date().toISOString()
+        });
       };
 
       ws.onclose = () => {
@@ -98,6 +107,11 @@ export default function Overview() {
         (prev) =>
           prev || "failed to open traffic websocket (lihat console browser)",
       );
+      setConnectionStatus({
+        status: "error",
+        lastError: e?.message || "failed to open traffic websocket",
+        lastChecked: new Date().toISOString()
+      });
     }
 
     return () => {
@@ -115,9 +129,19 @@ export default function Overview() {
       const list = Array.isArray(c) ? c : c?.connections || [];
       setConns(list);
       setTick((x) => x + 1);
+      setConnectionStatus({
+        status: "ok",
+        lastError: "",
+        lastChecked: new Date().toISOString()
+      });
     } catch (e) {
       console.error("[Overview] getConnections error:", e);
       setErr((prev) => prev || e.message || String(e));
+      setConnectionStatus({
+        status: "error",
+        lastError: e?.message || String(e),
+        lastChecked: new Date().toISOString()
+      });
     } finally {
       setLoading(false);
     }
