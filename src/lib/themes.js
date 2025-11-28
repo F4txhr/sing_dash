@@ -49,13 +49,12 @@ export const THEMES = {
     id: "aurora",
     name: "Aurora",
     card:
-      "rounded-2xl bg-slate-950/80 border border-emerald-400/40 shadow-[0_0_40px_-18px_rgba(45,212,191,0.8)]",
+      "rounded-2xl bg-slate-900/80 border border-emerald-300/50 shadow-[0_0_40px_-18px_rgba(45,212,191,0.8)] backdrop-blur-xl",
     sidebar:
-      "bg-slate-950/90 border border-emerald-400/40 shadow-[0_0_40px_-18px_rgba(45,212,191,0.8)]",
+      "bg-slate-900/80 border border-emerald-300/50 shadow-[0_0_40px_-18px_rgba(45,212,191,0.8)] backdrop-blur-xl",
     bottomNav:
-      "border border-emerald-400/40 bg-slate-950/95 shadow-[0_0_40px_-20px_rgba(45,212,191,0.9)]",
-    background:
-      "bg-slate-950 bg-[radial-gradient(circle_at_bottom,_#22c55e3d,_#020617)]",
+      "border border-emerald-300/50 bg-slate-950/90 shadow-[0_0_40px_-20px_rgba(45,212,191,0.9)] backdrop-blur-xl",
+    background: "bg-slate-950 bg-aurora-anim",
     latencyDisplay: "number"
   },
   sunset: {

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Card from "../ui/Card";
 import { formatSpeed } from "../../lib/utils";
 
@@ -8,11 +9,38 @@ export default function TrafficChart({ history }) {
     0
   );
   const safeMax = maxVal || 1; // hindari bagi 0
+  const [mode, setMode] = useState("line"); // 'line' | 'bars'
 
   return (
     <Card
       title="Traffic"
       className="lg:col-span-2"
+      headerRight={
+        <div className="flex items-center gap-1 text-[10px] text-slate-400">
+          <button
+            type="button"
+            className={`px-2 py-0.5 rounded-full border ${
+              mode === "line"
+                ? "border-sky-400 bg-sky-500/20 text-sky-100"
+                : "border-transparent text-slate-400 hover:text-sky-100 hover:bg-slate-800/70"
+            }`}
+            onClick={() => setMode("line")}
+          >
+            Line
+          </button>
+          <button
+            type="button"
+            className={`px-2 py-0.5 rounded-full border ${
+              mode === "bars"
+                ? "border-sky-400 bg-sky-500/20 text-sky-100"
+                : "border-transparent text-slate-400 hover:text-sky-100 hover:bg-slate-800/70"
+            }`}
+            onClick={() => setMode("bars")}
+          >
+            Bars
+          </button>
+        </div>
+      }
     >
       <div className="flex flex-col gap-2 h-40 md:h-56">
         {/* Legend */}
@@ -34,7 +62,7 @@ export default function TrafficChart({ history }) {
         <div className="flex-1 rounded-2xl bg-slate-950/60 border border-slate-800/80 px-3 py-2 overflow-hidden">
           {history.length < 2 ? (
             <div className="w-full h-full flex items-center justify-center text-[11px] text-slate-500">
-              Menunggu data traffic...
+              Waiting for traffic data...
             </div>
           ) : (
             <svg
@@ -89,18 +117,49 @@ export default function TrafficChart({ history }) {
                       const raw = Math.min(p[key] || 0, safeMax);
                       const ratio = Math.sqrt(raw / safeMax || 0); // smoothing
                       const y = 38 - ratio * 34; // 2px margin top/bottom
-                      return `${x},${y}`;
-                    })
-                    .join(" ");
+                      return { x, y };
+                    });
 
-                const downPts = makePoints("down");
-                const upPts = makePoints("up");
+                const downPoints = makePoints("down");
+                const upPoints = makePoints("up");
+                const downPtsStr = downPoints.map((p) => `${p.x},${p.y}`).join(" ");
+                const upPtsStr = upPoints.map((p) => `${p.x},${p.y}`).join(" ");
+
+                if (mode === "bars") {
+                  const barWidth = 100 / (history.length * 1.6 || 1);
+                  return (
+                    <>
+                      {downPoints.map((p, idx) => (
+                        <rect
+                          key={`down-${idx}`}
+                          x={p.x - barWidth / 2}
+                          y={p.y}
+                          width={barWidth}
+                          height={38 - p.y}
+                          fill="#38bdf8"
+                          opacity="0.55"
+                        />
+                      ))}
+                      {upPoints.map((p, idx) => (
+                        <rect
+                          key={`up-${idx}`}
+                          x={p.x - barWidth / 2}
+                          y={p.y}
+                          width={barWidth}
+                          height={38 - p.y}
+                          fill="#a855f7"
+                          opacity="0.45"
+                        />
+                      ))}
+                    </>
+                  );
+                }
 
                 return (
                   <>
                     {/* glow */}
                     <polyline
-                      points={downPts}
+                      points={downPtsStr}
                       fill="none"
                       stroke="#38bdf8"
                       strokeWidth="2"
@@ -110,7 +169,7 @@ export default function TrafficChart({ history }) {
                       opacity="0.7"
                     />
                     <polyline
-                      points={upPts}
+                      points={upPtsStr}
                       fill="none"
                       stroke="#a855f7"
                       strokeWidth="2"
@@ -122,7 +181,7 @@ export default function TrafficChart({ history }) {
 
                     {/* garis utama */}
                     <polyline
-                      points={downPts}
+                      points={downPtsStr}
                       fill="none"
                       stroke="#38bdf8"
                       strokeWidth="1.2"
@@ -130,7 +189,7 @@ export default function TrafficChart({ history }) {
                       strokeLinejoin="round"
                     />
                     <polyline
-                      points={upPts}
+                      points={upPtsStr}
                       fill="none"
                       stroke="#a855f7"
                       strokeWidth="1.1"

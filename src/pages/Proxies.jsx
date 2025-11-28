@@ -71,6 +71,9 @@ export default function Proxies() {
   // simple / advanced view
   const [viewMode, setViewMode] = useState("advanced"); // 'simple' | 'advanced'
 
+  // latency display: 'number' | 'bars'
+  const [latencyView, setLatencyView] = useState("number");
+
   // search
   const [search, setSearch] = useState("");
 
@@ -208,6 +211,30 @@ export default function Proxies() {
             </button>
           </div>
 
+          {/* latency view toggle */}
+          <div className="flex items-center text-[11px] border border-slate-700/80 rounded-2xl bg-slate-950/60 overflow-hidden">
+            <button
+              onClick={() => setLatencyView("number")}
+              className={`px-3 py-1 ${
+                latencyView === "number"
+                  ? "bg-sky-500/20 text-sky-100"
+                  : "text-slate-400"
+              }`}
+            >
+              ms
+            </button>
+            <button
+              onClick={() => setLatencyView("bars")}
+              className={`px-3 py-1 ${
+                latencyView === "bars"
+                  ? "bg-sky-500/20 text-sky-100"
+                  : "text-slate-400"
+              }`}
+            >
+              Bars
+            </button>
+          </div>
+
           {/* search */}
           <div className="flex items-center gap-1 text-[11px]">
             <span className="hidden md:inline text-slate-400">Search:</span>
@@ -286,6 +313,44 @@ export default function Proxies() {
           const showDetails =
             viewMode === "advanced" && !collapsed && allNames.length > 0;
 
+          const renderLatencyBars = (val) => {
+            if (val === "error" || val == null) {
+              return (
+                <span className="flex items-end gap-0.5">
+                  {[0, 1, 2, 3].map((i) => (
+                    <span
+                      key={i}
+                      className={`w-0.5 rounded-full ${
+                        i < 1 ? "h-[6px] bg-slate-600" : "h-[3px] bg-slate-700"
+                      }`}
+                    />
+                  ))}
+                </span>
+              );
+            }
+            const level =
+              val < 80 ? 4 : val < 150 ? 3 : val < 250 ? 2 : 1;
+            const heightClasses = ["h-[4px]", "h-[6px]", "h-[8px]", "h-[10px]"];
+            return (
+              <span className="flex items-end gap-0.5">
+                {[1, 2, 3, 4].map((i) => {
+                  const isActive = i <= level;
+                  const heightClass = heightClasses[i - 1];
+                  return (
+                    <span
+                      key={i}
+                      className={`w-0.5 rounded-full ${
+                        isActive
+                          ? `bg-sky-400 ${heightClass}`
+                          : "bg-slate-700 h-[4px]"
+                      }`}
+                    />
+                  );
+                })}
+              </span>
+            );
+          };
+
           return (
             <Card key={name} className="flex flex-col gap-2">
               {/* header card: quality dot + nama + latency + Test all + hide */}
@@ -299,20 +364,33 @@ export default function Proxies() {
                   <span className="text-sm font-semibold text-slate-100">
                     {name}
                   </span>
-                  <span
-                    className={`px-2 py-0.5 rounded-full border border-slate-700/80 bg-slate-900/80 text-[11px] ${getLatencyColor(
-                      currentLatency
-                    )}`}
-                  >
-                    {currentLatency === "error"
-                      ? "ERR"
-                      : currentLatency == null
-                      ? "-"
-                      : `${currentLatency} ms`}
-                  </span>
-                  <span className="text-[10px] text-slate-400">
-                    {latencyQualityLabel(currentLatency)}
-                  </span>
+                  {latencyView === "number" ? (
+                    <>
+                      <span
+                        className={`px-2 py-0.5 rounded-full border border-slate-700/80 bg-slate-900/80 text-[11px] ${getLatencyColor(
+                          currentLatency
+                        )}`}
+                      >
+                        {currentLatency === "error"
+                          ? "ERR"
+                          : currentLatency == null
+                          ? "-"
+                          : `${currentLatency} ms`}
+                      </span>
+                      <span className="text-[10px] text-slate-400">
+                        {latencyQualityLabel(currentLatency)}
+                      </span>
+                    </>
+                  ) : (
+                    <div className="flex items-center gap-1">
+                      <div className="px-2 py-0.5 rounded-full border border-slate-700/80 bg-slate-900/80 text-[11px]">
+                        {renderLatencyBars(currentLatency)}
+                      </div>
+                      <span className="text-[10px] text-slate-400">
+                        {latencyQualityLabel(currentLatency)}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex items-center gap-1">
@@ -336,11 +414,35 @@ export default function Proxies() {
                 </div>
               </div>
 
-              {/* info kecil */}
-              <div className="text-[11px] text-slate-400">
-                Type:{" "}
-                <span className="text-slate-200">{proxy.type}</span> • Now:{" "}
-                <span className="text-sky-300 font-medium">{proxy.now}</span>
+              {/* info kecil + small latency dots for group */}
+              <div className="text-[11px] text-slate-400 flex flex-col gap-1">
+                <div>
+                  Type:{" "}
+                  <span className="text-slate-200">{proxy.type}</span> • Now:{" "}
+                  <span className="text-sky-300 font-medium">{proxy.now}</span>
+                </div>
+                {(viewMode === "simple" || collapsed) && allNames.length > 0 && (
+                  <div className="flex flex-wrap items-center gap-1">
+                    {allNames.map((p) => {
+                      const lat = latency[p];
+                      return (
+                        <span
+                          key={p}
+                          className={`w-1.5 h-1.5 rounded-full ${qualityDotClass(
+                            lat
+                          )}`}
+                          title={`${p}${
+                            lat == null
+                              ? ""
+                              : lat === "error"
+                              ? " (ERR)"
+                              : ` (${lat} ms)`
+                          }`}
+                        />
+                      );
+                    })}
+                  </div>
+                )}
               </div>
 
               {/* daftar tag dalam 2 kolom (hanya advanced) */}
@@ -375,21 +477,25 @@ export default function Proxies() {
                           title={p}
                         >
                           <span className="text-left truncate">{p}</span>
-                          <span
-                            className={`${getLatencyColor(
-                              lat
-                            )} text-[10px] text-right shrink-0 ml-1`}
-                          >
-                            {latText}
-                          </span>
+                          {latencyView === "number" ? (
+                            <span
+                              className={`${getLatencyColor(
+                                lat
+                              )} text-[10px] text-right shrink-0 ml-1`}
+                            >
+                              {latText}
+                            </span>
+                          ) : (
+                            <span className="flex justify-end shrink-0 ml-1">
+                              {renderLatencyBars(lat)}
+                            </span>
+                          )}
                         </button>
                       );
                     })}
                   </div>
                 )}
               </div>
-
-              
             </Card>
           );
         })}
