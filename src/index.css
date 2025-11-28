@@ -115,3 +115,19 @@ body {
   background-size: 400% 400%;
   animation: yacdGradientShift 15s ease infinite;
 }
+
+/* full-screen triangles background for YACD-like theme */
+.triangles-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.triangles-bg-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transition: opacity 3s ease;
+}

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import AppLayout from "./components/layout/AppLayout";
 import { useTheme } from "./lib/themeContext";
+import TrianglesBackground from "./components/layout/TrianglesBackground";
 
 import Overview from "./pages/Overview";
 import Proxies from "./pages/Proxies";
@@ -78,6 +79,11 @@ export default function App() {
           <div className="absolute -top-40 -left-40 w-96 h-96 bg-sky-500/20 blur-3xl rounded-full" />
           <div className="absolute -bottom-40 -right-40 w-[28rem] h-[28rem] bg-emerald-500/15 blur-3xl rounded-full" />
         </div>
+      )}
+
+      {themeId === "yacd" && (
+        // geometric animated background behind content
+        <TrianglesBackground />
       )}
 
       <AppLayout activePage={page} onChangePage={handleChangePage}>
