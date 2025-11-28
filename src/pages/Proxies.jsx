@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
 import { getProxies, apiPut, getProxyDelay } from "../lib/clashApi";
+import { useTheme } from "../lib/themeContext";
 
 const LATENCY_TEST_URL = "http://www.gstatic.com/generate_204";
 
@@ -25,22 +26,71 @@ function extractLatencyMap(proxiesObj) {
   return map;
 }
 
-function getLatencyColor(val) {
-  if (val === "error" || val === null || val === undefined)
-    return "text-slate-500";
-  if (val < 80) return "text-emerald-400";
-  if (val < 150) return "text-lime-300";
-  if (val < 250) return "text-yellow-300";
-  return "text-rose-400";
+const LATENCY_PALETTES = {
+  default: {
+    text: ["text-emerald-400", "text-lime-300", "text-yellow-300", "text-rose-400"],
+    bg: ["bg-emerald-400", "bg-lime-300", "bg-yellow-300", "bg-rose-400"],
+    bar: "bg-sky-400"
+  },
+  matrix: {
+    text: ["text-emerald-400", "text-emerald-300", "text-lime-300", "text-emerald-200"],
+    bg: ["bg-emerald-400", "bg-emerald-300", "bg-lime-300", "bg-emerald-200"],
+    bar: "bg-emerald-400"
+  },
+  terminal: {
+    text: ["text-emerald-400", "text-emerald-300", "text-lime-300", "text-emerald-200"],
+    bg: ["bg-emerald-400", "bg-emerald-300", "bg-lime-300", "bg-emerald-200"],
+    bar: "bg-emerald-400"
+  },
+  cyberpunk: {
+    text: ["text-fuchsia-300", "text-pink-300", "text-amber-300", "text-rose-400"],
+    bg: ["bg-fuchsia-400", "bg-pink-400", "bg-amber-300", "bg-rose-400"],
+    bar: "bg-fuchsia-400"
+  },
+  sunset: {
+    text: ["text-orange-300", "text-amber-300", "text-yellow-300", "text-rose-400"],
+    bg: ["bg-orange-400", "bg-amber-400", "bg-yellow-300", "bg-rose-400"],
+    bar: "bg-orange-400"
+  },
+  aurora: {
+    text: ["text-emerald-300", "text-emerald-200", "text-lime-300", "text-rose-400"],
+    bg: ["bg-emerald-400", "bg-emerald-300", "bg-lime-300", "bg-rose-400"],
+    bar: "bg-emerald-400"
+  },
+  ocean: {
+    text: ["text-cyan-300", "text-sky-300", "text-teal-300", "text-rose-400"],
+    bg: ["bg-cyan-400", "bg-sky-400", "bg-teal-400", "bg-rose-400"],
+    bar: "bg-cyan-400"
+  },
+  pastel: {
+    text: ["text-sky-300", "text-cyan-300", "text-emerald-300", "text-rose-400"],
+    bg: ["bg-sky-400", "bg-cyan-400", "bg-emerald-400", "bg-rose-400"],
+    bar: "bg-sky-400"
+  }
+};
+
+function getLatencyPalette(themeId) {
+  return LATENCY_PALETTES[themeId] || LATENCY_PALETTES.default;
 }
 
-function qualityDotClass(val) {
+function getLatencyColor(val, themeId) {
+  if (val === "error" || val === null || val === undefined)
+    return "text-slate-500";
+  const palette = getLatencyPalette(themeId);
+  if (val &lt; 80) return palette.text[0];
+  if (val &lt; 150) return palette.text[1];
+  if (val &lt; 250) return palette.text[2];
+  return palette.text[3];
+}
+
+function qualityDotClass(val, themeId) {
   if (val === "error" || val === null || val === undefined)
     return "bg-slate-500";
-  if (val < 80) return "bg-emerald-400";
-  if (val < 150) return "bg-lime-300";
-  if (val < 250) return "bg-yellow-300";
-  return "bg-rose-400";
+  const palette = getLatencyPalette(themeId);
+  if (val &lt; 80) return palette.bg[0];
+  if (val &lt; 150) return palette.bg[1];
+  if (val &lt; 250) return palette.bg[2];
+  return palette.bg[3];
 }
 
 function latencyQualityLabel(val) {
@@ -56,6 +106,7 @@ export default function Proxies() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
+  const { themeId } = useTheme();
 
   const [latency, setLatency] = useState({});
   const [testingGroup, setTestingGroup] = useState("");
@@ -358,7 +409,8 @@ export default function Proxies() {
                 <div className="flex items-center gap-2">
                   <span
                     className={`w-2 h-2 rounded-full ${qualityDotClass(
-                      currentLatency
+                      currentLatency,
+                      themeId
                     )}`}
                   />
                   <span className="text-sm font-semibold text-slate-100">
@@ -368,7 +420,8 @@ export default function Proxies() {
                     <>
                       <span
                         className={`px-2 py-0.5 rounded-full border border-slate-700/80 bg-slate-900/80 text-[11px] ${getLatencyColor(
-                          currentLatency
+                          currentLatency,
+                          themeId
                         )}`}
                       >
                         {currentLatency === "error"
@@ -422,14 +475,15 @@ export default function Proxies() {
                   <span className="text-sky-300 font-medium">{proxy.now}</span>
                 </div>
                 {(viewMode === "simple" || collapsed) && allNames.length > 0 && (
-                  <div className="flex flex-wrap items-center gap-1">
+                  <div className="grid grid-cols-6 gap-1.5 mt-0.5">
                     {allNames.map((p) => {
                       const lat = latency[p];
                       return (
                         <span
                           key={p}
-                          className={`w-1.5 h-1.5 rounded-full ${qualityDotClass(
-                            lat
+                          className={`w-3 h-3 rounded-full ${qualityDotClass(
+                            lat,
+                            themeId
                           )}`}
                           title={`${p}${
                             lat == null
@@ -480,7 +534,8 @@ export default function Proxies() {
                           {latencyView === "number" ? (
                             <span
                               className={`${getLatencyColor(
-                                lat
+                                lat,
+                                themeId
                               )} text-[10px] text-right shrink-0 ml-1`}
                             >
                               {latText}

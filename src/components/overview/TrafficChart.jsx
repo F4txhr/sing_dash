@@ -1,6 +1,46 @@
 import { useState } from "react";
 import Card from "../ui/Card";
 import { formatSpeed } from "../../lib/utils";
+import { useTheme } from "../../lib/themeContext";
+
+const TRAFFIC_PALETTES = {
+  default: {
+    down: "#38bdf8",
+    up: "#a855f7",
+    gridMajor: "#1e293b",
+    gridMinor: "#020617"
+  },
+  aurora: {
+    down: "#4ade80",
+    up: "#22c55e",
+    gridMajor: "#064e3b",
+    gridMinor: "#022c22"
+  },
+  cyberpunk: {
+    down: "#f472b6",
+    up: "#a855f7",
+    gridMajor: "#4c1d95",
+    gridMinor: "#020617"
+  },
+  ocean: {
+    down: "#22d3ee",
+    up: "#0ea5e9",
+    gridMajor: "#0f172a",
+    gridMinor: "#020617"
+  },
+  pastel: {
+    down: "#7dd3fc",
+    up: "#a5b4fc",
+    gridMajor: "#1e293b",
+    gridMinor: "#020617"
+  },
+  matrix: {
+    down: "#22c55e",
+    up: "#4ade80",
+    gridMajor: "#022c22",
+    gridMinor: "#020617"
+  }
+};
 
 export default function TrafficChart({ history }) {
   // hitung max value dari history untuk scaling
@@ -10,6 +50,8 @@ export default function TrafficChart({ history }) {
   );
   const safeMax = maxVal || 1; // hindari bagi 0
   const [mode, setMode] = useState("line"); // 'line' | 'bars'
+  const { themeId } = useTheme();
+  const palette = TRAFFIC_PALETTES[themeId] || TRAFFIC_PALETTES.default;
 
   return (
     <Card
@@ -88,7 +130,7 @@ export default function TrafficChart({ history }) {
                 y1="20"
                 x2="100"
                 y2="20"
-                stroke="#1e293b"
+                stroke={palette.gridMajor}
                 strokeWidth="0.4"
               />
               <line
@@ -96,7 +138,7 @@ export default function TrafficChart({ history }) {
                 y1="10"
                 x2="100"
                 y2="10"
-                stroke="#020617"
+                stroke={palette.gridMinor}
                 strokeWidth="0.3"
               />
               <line
@@ -104,7 +146,7 @@ export default function TrafficChart({ history }) {
                 y1="30"
                 x2="100"
                 y2="30"
-                stroke="#020617"
+                stroke={palette.gridMinor}
                 strokeWidth="0.3"
               />
 
@@ -136,7 +178,7 @@ export default function TrafficChart({ history }) {
                           y={p.y}
                           width={barWidth}
                           height={38 - p.y}
-                          fill="#38bdf8"
+                          fill={palette.down}
                           opacity="0.55"
                         />
                       ))}
@@ -147,7 +189,7 @@ export default function TrafficChart({ history }) {
                           y={p.y}
                           width={barWidth}
                           height={38 - p.y}
-                          fill="#a855f7"
+                          fill={palette.up}
                           opacity="0.45"
                         />
                       ))}
@@ -161,7 +203,7 @@ export default function TrafficChart({ history }) {
                     <polyline
                       points={downPtsStr}
                       fill="none"
-                      stroke="#38bdf8"
+                      stroke={palette.down}
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -171,7 +213,7 @@ export default function TrafficChart({ history }) {
                     <polyline
                       points={upPtsStr}
                       fill="none"
-                      stroke="#a855f7"
+                      stroke={palette.up}
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -183,7 +225,7 @@ export default function TrafficChart({ history }) {
                     <polyline
                       points={downPtsStr}
                       fill="none"
-                      stroke="#38bdf8"
+                      stroke={palette.down}
                       strokeWidth="1.2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -191,7 +233,7 @@ export default function TrafficChart({ history }) {
                     <polyline
                       points={upPtsStr}
                       fill="none"
-                      stroke="#a855f7"
+                      stroke={palette.up}
                       strokeWidth="1.1"
                       strokeLinecap="round"
                       strokeLinejoin="round"
