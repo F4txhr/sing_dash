@@ -143,7 +143,7 @@ export const THEMES = {
       "bg-white/12 backdrop-blur-[16px] border border-white/25 shadow-[0_10px_40px_rgba(0,0,0,0.35)]",
     bottomNav:
       "border border-white/20 bg-white/10 backdrop-blur-[14px] shadow-[0_10px_32px_rgba(0,0,0,0.4)]",
-    background: "bg-yacd-gradient",
+    background: "bg-yacd-gradient bg-geo-anim",
     latencyDisplay: "number"
   }
 };
