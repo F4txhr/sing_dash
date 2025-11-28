@@ -30,7 +30,7 @@ function getInitialPage() {
 
 export default function App() {
   const [page, setPage] = useState(getInitialPage);
-  const { theme } = useTheme();
+  const { themeId, theme } = useTheme();
 
   const handleChangePage = (nextPage) => {
     setPage(nextPage);
@@ -72,11 +72,13 @@ export default function App() {
         theme.background || ""
       }`}
     >
-      {/* blur / glow background */}
-      <div className="pointer-events-none fixed inset-0">
-        <div className="absolute -top-40 -left-40 w-96 h-96 bg-sky-500/20 blur-3xl rounded-full" />
-        <div className="absolute -bottom-40 -right-40 w-[28rem] h-[28rem] bg-emerald-500/15 blur-3xl rounded-full" />
-      </div>
+      {/* blur / glow background (skip on YACD theme to let gradient dominate) */}
+      {themeId !== "yacd" && (
+        <div className="pointer-events-none fixed inset-0">
+          <div className="absolute -top-40 -left-40 w-96 h-96 bg-sky-500/20 blur-3xl rounded-full" />
+          <div className="absolute -bottom-40 -right-40 w-[28rem] h-[28rem] bg-emerald-500/15 blur-3xl rounded-full" />
+        </div>
+      )}
 
       <AppLayout activePage={page} onChangePage={handleChangePage}>
         {renderPage()}
