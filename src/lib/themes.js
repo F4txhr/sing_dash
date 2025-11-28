@@ -133,6 +133,18 @@ export const THEMES = {
     background:
       "bg-black bg-[radial-gradient(circle_at_top,_#22c55e2b,_#020617)]",
     latencyDisplay: "number"
+  },
+  yacd: {
+    id: "yacd",
+    name: "YACD Glass",
+    card:
+      "rounded-2xl bg-white/10 backdrop-blur-[12px] border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.35)]",
+    sidebar:
+      "bg-white/12 backdrop-blur-[16px] border border-white/25 shadow-[0_10px_40px_rgba(0,0,0,0.35)]",
+    bottomNav:
+      "border border-white/20 bg-white/10 backdrop-blur-[14px] shadow-[0_10px_32px_rgba(0,0,0,0.4)]",
+    background: "bg-yacd-gradient",
+    latencyDisplay: "number"
   }
 };
 
