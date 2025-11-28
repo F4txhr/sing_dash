@@ -273,14 +273,14 @@ export default function Overview() {
 
       {/* KPI cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-5 gap-3">
-        <Card title="Upload" className="!p-3 md:!p-4">
+        <Card title="Upload" className="!p-3 md:!p-4 flex flex-col justify-between min-h-[64px] md:min-h-[72px]">
           <div className="text-sm font-semibold">{formatSpeed(upSpeed)}</div>
           <div className="text-[11px] text-slate-400 mt-0.5">
             Current upload speed
           </div>
         </Card>
 
-        <Card title="Download" className="!p-3 md:!p-4">
+        <Card title="Download" className="!p-3 md:!p-4 flex flex-col justify-between min-h-[64px] md:min-h-[72px]">
           <div className="text-sm font-semibold">{formatSpeed(downSpeed)}</div>
           <div className="text-[11px] text-slate-400 mt-0.5">
             Current download speed
@@ -288,16 +288,16 @@ export default function Overview() {
         </Card>
 
         {/* Upload total (from local calculation or backend, if available) */}
-        <Card title="Upload total" className="!p-3 md:!p-4">
+        <Card title="Upload total" className="!p-3 md:!p-4 flex items-center min-h-[64px] md:min-h-[72px]">
           <div className="text-sm font-semibold">{formatBytes(upTotal)}</div>
         </Card>
 
         {/* Download total */}
-        <Card title="Download total" className="!p-3 md:!p-4">
+        <Card title="Download total" className="!p-3 md:!p-4 flex items-center min-h-[64px] md:min-h-[72px]">
           <div className="text-sm font-semibold">{formatBytes(downTotal)}</div>
         </Card>
 
-        <Card title="Active connections" className="!p-3 md:!p-4">
+        <Card title="Active connections" className="!p-3 md:!p-4 flex items-center min-h-[64px] md:min-h-[72px]">
           <div className="text-sm font-semibold">{activeConns}</div>
         </Card>
       </div>
