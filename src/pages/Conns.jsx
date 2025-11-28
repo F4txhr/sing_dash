@@ -48,7 +48,7 @@ export default function Conns() {
             Connections
           </h1>
           <p className="text-xs text-slate-400">
-            Active connections dari /connections.
+            Active connections from /connections.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -87,7 +87,7 @@ export default function Conns() {
 
       <Card
         title="Connections"
-        description="Daftar koneksi aktif yang sedang melewati Sing-box."
+        description="List of active connections going through Sing-box."
       >
         <div className="hidden md:grid grid-cols-[minmax(0,1.8fr)_minmax(0,0.6fr)_minmax(0,1fr)_minmax(0,0.8fr)] gap-2 text-[11px] text-slate-400 mb-2 px-1">
           <div>Host</div>
@@ -137,7 +137,7 @@ export default function Conns() {
             })
           ) : (
             <div className="text-xs text-slate-500">
-              Tidak ada koneksi aktif.
+              No active connections.
             </div>
           )}
         </div>

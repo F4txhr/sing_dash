@@ -24,7 +24,7 @@ export default function ConfigPage() {
           lastError: "",
           lastChecked: new Date().toISOString()
         });
-        setMsg("API OK: /configs berhasil di-load.");
+        setMsg("API OK: /configs loaded successfully.");
       }
     } catch (e) {
       const message = e.message || String(e);
@@ -34,9 +34,9 @@ export default function ConfigPage() {
           lastError: message,
           lastChecked: new Date().toISOString()
         });
-        setMsg("Error test /configs: " + message);
+        setMsg("Error testing /configs: " + message);
       } else {
-        setMsg("Error load /configs: " + message);
+        setMsg("Error loading /configs: " + message);
       }
     } finally {
       setLoading(false);
@@ -50,7 +50,7 @@ export default function ConfigPage() {
   const handleSaveApi = () => {
     const merged = setApiConfig(apiCfg);
     setApiCfgState(merged);
-    setMsg("API config saved. Silakan refresh halaman lain.");
+    setMsg("API config saved. Please refresh the other pages.");
   };
 
   const handleTestConnection = () => {
@@ -81,7 +81,7 @@ export default function ConfigPage() {
             Config
           </h1>
           <p className="text-xs text-slate-400">
-            Pengaturan API & beberapa field /configs.
+            API settings and selected /configs fields.
           </p>
         </div>
         <Button size="sm" onClick={loadCfg} disabled={loading}>

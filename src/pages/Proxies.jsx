@@ -45,11 +45,11 @@ function qualityDotClass(val) {
 
 function latencyQualityLabel(val) {
   if (val === "error") return "Error";
-  if (val === null || val === undefined) return "Tidak diketahui";
-  if (val < 80) return "Sangat baik";
-  if (val < 150) return "Baik";
-  if (val < 250) return "Cukup";
-  return "Buruk";
+  if (val === null || val === undefined) return "Unknown";
+  if (val < 80) return "Excellent";
+  if (val < 150) return "Good";
+  if (val < 250) return "Fair";
+  return "Poor";
 }
 
 export default function Proxies() {
@@ -184,7 +184,7 @@ export default function Proxies() {
             Proxies
           </h1>
           <p className="text-xs text-slate-400">
-            Pemilihan grup dan pemantauan latency dari /proxies.
+            Group selection and latency monitor from /proxies.
           </p>
         </div>
 
@@ -215,10 +215,10 @@ export default function Proxies() {
 
           {/* search */}
           <div className="flex items-center gap-1 text-[11px]">
-            <span className="hidden md:inline text-slate-400">Cari:</span>
+            <span className="hidden md:inline text-slate-400">Search:</span>
             <input
               className="rounded-2xl bg-slate-950/60 border border-slate-700/80 px-3 py-1 text-[11px] outline-none focus:border-sky-500 min-w-[140px]"
-              placeholder="grup / node..."
+              placeholder="group / node..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -275,7 +275,7 @@ export default function Proxies() {
       <section className="space-y-4 max-w-4xl mx-auto">
         {entries.length === 0 && !loading && (
           <div className="text-xs text-slate-500">
-            Tidak ada group proxy yang cocok dengan pencarian.
+            No proxy group matches the current search.
           </div>
         )}
 
@@ -400,10 +400,10 @@ export default function Proxies() {
         })}
       </section>
 
-      {/* indicator kecil untuk mobile */}
+      {/* small indicator for mobile */}
       <div className="md:hidden text-[11px] text-slate-400">
-        Auto-refresh: {autoRefresh ? `${intervalSec}s` : "Off"} (ubah di versi
-        desktop)
+        Auto-refresh: {autoRefresh ? `${intervalSec}s` : "Off"} (change from
+        desktop view)
       </div>
     </div>
   );

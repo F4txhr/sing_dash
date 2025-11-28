@@ -58,7 +58,7 @@ export default function Rules() {
             Rules
           </h1>
           <p className="text-xs text-slate-400">
-            Daftar rules dari /rules (format menyesuaikan Sing-box).
+            Rules list from /rules (format follows the backend).
           </p>
         </div>
         <Button size="sm" onClick={load} disabled={loading}>
@@ -76,7 +76,7 @@ export default function Rules() {
         <div className="text-xs font-mono space-y-2 max-h-[420px] overflow-y-auto">
           {rules.length === 0 && !err && (
             <div className="text-slate-500">
-              Tidak ada rules atau API /rules mengembalikan list kosong.
+              No rules or /rules returned an empty list.
             </div>
           )}
           {rules.map((r, i) => (

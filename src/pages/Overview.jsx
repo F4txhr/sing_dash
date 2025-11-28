@@ -92,7 +92,7 @@ export default function Overview() {
       ws.onerror = (e) => {
         console.error("[Overview] traffic WS error:", e);
         setErr(
-          (prev) => prev || "traffic websocket error (lihat console browser)",
+          (prev) => prev || "traffic websocket error (see browser console)",
         );
         setConnectionStatus({
           status: "error",
@@ -108,7 +108,7 @@ export default function Overview() {
       console.error("[Overview] failed to open traffic WS:", e);
       setErr(
         (prev) =>
-          prev || "failed to open traffic websocket (lihat console browser)",
+          prev || "failed to open traffic websocket (see browser console)",
       );
       setConnectionStatus({
         status: "error",
@@ -225,7 +225,7 @@ export default function Overview() {
             </span>
           </div>
           <p className="text-xs text-slate-400">
-            Ringkasan trafik & koneksi Sing-box / Clash.
+            Traffic and connection summary (Sing-box / Clash compatible).
           </p>
         </div>
 
@@ -281,37 +281,37 @@ export default function Overview() {
         <Card title="Upload" className="!p-3 md:!p-4">
           <div className="text-sm font-semibold">{formatSpeed(upSpeed)}</div>
           <div className="text-[11px] text-slate-400 mt-0.5">
-            Kecepatan saat ini
+            Current upload speed
           </div>
         </Card>
 
         <Card title="Download" className="!p-3 md:!p-4">
           <div className="text-sm font-semibold">{formatSpeed(downSpeed)}</div>
           <div className="text-[11px] text-slate-400 mt-0.5">
-            Kecepatan saat ini
+            Current download speed
           </div>
         </Card>
 
-        {/* Upload Total (dari kalkulasi lokal atau dari backend jika ada) */}
-        <Card title="Upload Total" className="!p-3 md:!p-4">
+        {/* Upload total (from local calculation or backend, if available) */}
+        <Card title="Upload total" className="!p-3 md:!p-4">
           <div className="text-sm font-semibold">{formatBytes(upTotal)}</div>
           <div className="text-[11px] text-slate-400 mt-0.5">
-            Estimasi total upload (sejak buka halaman ini)
+            Estimated upload since this page was opened
           </div>
         </Card>
 
-        {/* Download Total */}
-        <Card title="Download Total" className="!p-3 md:!p-4">
+        {/* Download total */}
+        <Card title="Download total" className="!p-3 md:!p-4">
           <div className="text-sm font-semibold">{formatBytes(downTotal)}</div>
           <div className="text-[11px] text-slate-400 mt-0.5">
-            Estimasi total download (sejak buka halaman ini)
+            Estimated download since this page was opened
           </div>
         </Card>
 
         <Card title="Active connections" className="!p-3 md:!p-4">
           <div className="text-sm font-semibold">{activeConns}</div>
           <div className="text-[11px] text-slate-400 mt-0.5">
-            Dari /connections
+            From /connections
           </div>
         </Card>
       </div>
