@@ -93,7 +93,7 @@ export default function AppLayout({ children, activePage, onChangePage }) {
             </div>
           </header>
 
-          <main className="flex-1 px-3 sm:px-4 md:px-6 lg:px-8 py-4 md:py-6 max-w-4xl sm:max-w-5xl lg:max-w-6xl 2xl:max-w-7xl mx-auto w-full overflow-y-auto">
+          <main className="flex-1 px-3 sm:px-4 md:px-6 lg:px-8 py-4 md:py-6 max-w-5xl sm:max-w-6xl lg:max-w-7xl 2xl:max-w-7xl mx-auto w-full overflow-y-auto">
             {children}
           </main>
         </div>
