@@ -37,7 +37,10 @@ export default function Overview() {
         setErr((e) => (e.startsWith("traffic") ? "" : e));
         setConnectionStatus({
           status: "ok",
-         ;
+          lastError: "",
+          lastChecked: new Date().toISOString()
+        });
+      };
 
       ws.onmessage = (evt) => {
         try {
