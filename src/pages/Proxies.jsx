@@ -69,8 +69,19 @@ const LATENCY_PALETTES = {
   }
 };
 
+const LATENCY_BAR_CONFIG = {
+  matrix: { count: 5, heights: [4, 6, 8, 10, 12] },
+  cyberpunk: { count: 3, heights: [6, 9, 12] },
+  pastel: { count: 4, heights: [4, 7, 10, 13] },
+  default: { count: 4, heights: [4, 6, 8, 10] }
+};
+
 function getLatencyPalette(themeId) {
   return LATENCY_PALETTES[themeId] || LATENCY_PALETTES.default;
+}
+
+function getLatencyBarConfig(themeId) {
+  return LATENCY_BAR_CONFIG[themeId] || LATENCY_BAR_CONFIG.default;
 }
 
 function getLatencyColor(val, themeId) {
@@ -365,34 +376,45 @@ export default function Proxies() {
             viewMode === "advanced" && !collapsed && allNames.length > 0;
 
           const renderLatencyBars = (val) => {
+            const palette = getLatencyPalette(themeId);
+            const config = getLatencyBarConfig(themeId);
+            const count = config.count;
+            const heights = config.heights;
+
             if (val === "error" || val == null) {
               return (
                 <span className="flex items-end gap-0.5">
-                  {[0, 1, 2, 3].map((i) => (
+                  {Array.from({ length: count }).map((_, i) => (
                     <span
                       key={i}
                       className={`w-0.5 rounded-full ${
-                        i < 1 ? "h-[6px] bg-slate-600" : "h-[3px] bg-slate-700"
+                        i === 0 ? "h-[6px] bg-slate-600" : "h-[3px] bg-slate-700"
                       }`}
                     />
                   ))}
                 </span>
               );
             }
-            const level =
-              val < 80 ? 4 : val < 150 ? 3 : val < 250 ? 2 : 1;
-            const heightClasses = ["h-[4px]", "h-[6px]", "h-[8px]", "h-[10px]"];
+
+            const baseLevel = val < 80 ? 4 : val < 150 ? 3 : val < 250 ? 2 : 1;
+            const level = Math.max(
+              1,
+              Math.min(count, Math.round((baseLevel / 4) * count))
+            );
+
             return (
               <span className="flex items-end gap-0.5">
-                {[1, 2, 3, 4].map((i) => {
+                {Array.from({ length: count }).map((_, idx) => {
+                  const i = idx + 1;
                   const isActive = i <= level;
-                  const heightClass = heightClasses[i - 1];
+                  const heightClass =
+                    heights[idx] != null ? `h-[${heights[idx]}px]` : "h-[4px]";
                   return (
                     <span
                       key={i}
                       className={`w-0.5 rounded-full ${
                         isActive
-                          ? `bg-sky-400 ${heightClass}`
+                          ? `${palette.bar} ${heightClass}`
                           : "bg-slate-700 h-[4px]"
                       }`}
                     />
@@ -475,13 +497,13 @@ export default function Proxies() {
                   <span className="text-sky-300 font-medium">{proxy.now}</span>
                 </div>
                 {(viewMode === "simple" || collapsed) && allNames.length > 0 && (
-                  <div className="grid grid-cols-6 gap-1.5 mt-0.5">
+                  <div className="flex flex-wrap gap-1.5 mt-0.5">
                     {allNames.map((p) => {
                       const lat = latency[p];
                       return (
                         <span
                           key={p}
-                          className={`w-3 h-3 rounded-full ${qualityDotClass(
+                          className={`w-3 h-3 md:w-3.5 md:h-3.5 rounded-full ${qualityDotClass(
                             lat,
                             themeId
                           )}`}
