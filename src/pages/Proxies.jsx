@@ -28,27 +28,27 @@ function extractLatencyMap(proxiesObj) {
 function getLatencyColor(val) {
   if (val === "error" || val === null || val === undefined)
     return "text-slate-500";
-  if (val &lt; 80) return "text-emerald-400";
-  if (val &lt; 150) return "text-lime-300";
-  if (val &lt; 250) return "text-yellow-300";
+  if (val < 80) return "text-emerald-400";
+  if (val < 150) return "text-lime-300";
+  if (val < 250) return "text-yellow-300";
   return "text-rose-400";
 }
 
 function qualityDotClass(val) {
   if (val === "error" || val === null || val === undefined)
     return "bg-slate-500";
-  if (val &lt; 80) return "bg-emerald-400";
-  if (val &lt; 150) return "bg-lime-300";
-  if (val &lt; 250) return "bg-yellow-300";
+  if (val < 80) return "bg-emerald-400";
+  if (val < 150) return "bg-lime-300";
+  if (val < 250) return "bg-yellow-300";
   return "bg-rose-400";
 }
 
 function latencyQualityLabel(val) {
   if (val === "error") return "Error";
   if (val === null || val === undefined) return "Unknown";
-  if (val &lt; 80) return "Excellent";
-  if (val &lt; 150) return "Good";
-  if (val &lt; 250) return "Fair";
+  if (val < 80) return "Excellent";
+  if (val < 150) return "Good";
+  if (val < 250) return "Fair";
   return "Poor";
 }
 
