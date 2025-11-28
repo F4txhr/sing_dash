@@ -45,11 +45,11 @@ function qualityDotClass(val) {
 
 function latencyQualityLabel(val) {
   if (val === "error") return "Error";
-  if (val === null || val === undefined) return "Unknown";
-  if (val < 80) return "Excellent";
-  if (val < 150) return "Good";
-  if (val < 250) return "Fair";
-  return "Poor";
+  if (val === null || val === undefined) return "Tidak diketahui";
+  if (val < 80) return "Sangat baik";
+  if (val < 150) return "Baik";
+  if (val < 250) return "Cukup";
+  return "Buruk";
 }
 
 export default function Proxies() {
@@ -163,28 +163,16 @@ export default function Proxies() {
     }));
   };
 
-  // filter berdasarkan search
+  // filter berdasarkan search (urutan tetap mengikuti urutan dari backend)
   const entriesRaw = Object.entries(proxies).filter(
     ([, proxy]) => Array.isArray(proxy.all)
   );
 
   const searchLower = search.trim().toLowerCase();
-  const filteredEntries = entriesRaw.filter(([name, proxy]) => {
+  const entries = entriesRaw.filter(([name, proxy]) => {
     if (!searchLower) return true;
     if (name.toLowerCase().includes(searchLower)) return true;
     return proxy.all.some((p) => p.toLowerCase().includes(searchLower));
-  });
-
-  // urutkan group berdasarkan latency proxy aktif (paling cepat di atas)
-  const entries = filteredEntries.sort(([nameA, proxyA], [nameB, proxyB]) => {
-    const latA = latency[proxyA.now];
-    const latB = latency[proxyB.now];
-    const a = typeof latA === "number" ? latA : Number.POSITIVE_INFINITY;
-    const b = typeof latB === "number" ? latB : Number.POSITIVE_INFINITY;
-    if (a === b) {
-      return nameA.localeCompare(nameB);
-    }
-    return a - b;
   });
 
   return (
@@ -196,7 +184,7 @@ export default function Proxies() {
             Proxies
           </h1>
           <p className="text-xs text-slate-400">
-            Group selector & latency monitor dari /proxies.
+            Pemilihan grup dan pemantauan latency dari /proxies.
           </p>
         </div>
 
@@ -227,10 +215,10 @@ export default function Proxies() {
 
           {/* search */}
           <div className="flex items-center gap-1 text-[11px]">
-            <span className="hidden md:inline text-slate-400">Search:</span>
+            <span className="hidden md:inline text-slate-400">Cari:</span>
             <input
               className="rounded-2xl bg-slate-950/60 border border-slate-700/80 px-3 py-1 text-[11px] outline-none focus:border-sky-500 min-w-[140px]"
-              placeholder="group / node..."
+              placeholder="grup / node..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -406,13 +394,7 @@ export default function Proxies() {
                 )}
               </div>
 
-              {viewMode === "simple" && (
-                <div className="text-[11px] text-slate-500 mt-1">
-                  Simple view: daftar node disembunyikan. Gunakan mode
-                  <span className="text-sky-300"> Advanced</span> untuk melihat
-                  semua tag.
-                </div>
-              )}
+              
             </Card>
           );
         })}
