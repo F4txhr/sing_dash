@@ -174,20 +174,7 @@ export default function Proxies() {
     return () => clearInterval(id);
   }, [autoRefresh, intervalSec]);
 
-  // adjust default view when latency style changes
-  useEffect(() => {
-    if (
-      latencyStyleId === "barsThin" ||
-      latencyStyleId === "barsThick" ||
-      latencyStyleId === "barsDense" ||
-      latencyStyleId === "barProgress" ||
-      latencyStyleId === "hybrid"
-    ) {
-      setLatencyView("bars");
-    } else {
-      setLatencyView("number");
-    }
-  }, [latencyStyleId]);
+  
 
   const handleSwitch = async (group, proxy) => {
     await apiPut(`/proxies/${encodeURIComponent(group)}`, { name: proxy });
@@ -459,27 +446,29 @@ export default function Proxies() {
             );
           };
 
-          const renderHeaderLatencyNumber = () => {
+          const renderHeaderLatencyIndicator = () => {
             const colorClass = getLatencyColor(currentLatency, themeId);
             const qualityText = qualityLabel;
+            const levelPercent =
+              qualityLevel <= 0 ? 0 : (qualityLevel / 4) * 100;
 
             switch (latencyStyleId) {
               case "pill":
                 return (
-                  <>
+                  <div className="flex items-center gap-1.5">
                     <span
                       className={`px-2.5 py-0.5 rounded-full text-[11px] border border-sky-500/60 bg-gradient-to-r from-sky-500/20 via-emerald-500/10 to-fuchsia-500/20 ${colorClass}`}
                     >
                       {latencyText}
                     </span>
-                    <span className="text-[10px] text-slate-300">
+                    <span className="hidden sm:inline text-[10px] text-slate-300">
                       {qualityText}
                     </span>
-                  </>
+                  </div>
                 );
               case "chip":
                 return (
-                  <div className="flex flex-col gap-0.5">
+                  <div className="flex items-center gap-1.5">
                     <span className="px-2 py-0.5 rounded-full text-[10px] border border-slate-600/80 bg-slate-900/80 text-slate-100">
                       {qualityText}
                     </span>
@@ -504,79 +493,23 @@ export default function Proxies() {
                 );
               case "quality":
                 return (
-                  <div className="flex flex-col gap-0.5">
+                  <div className="flex items-center gap-1.5">
                     <span className="px-2 py-0.5 rounded-full text-[11px] border border-slate-600/80 bg-slate-900/80 text-slate-100">
                       {qualityText}
-                    </span>
-                    <span className="text-[10px] text-slate-400">
-                      {latencyText}
                     </span>
                   </div>
                 );
               case "barsThin":
               case "barsThick":
               case "barsDense":
-              case "barProgress":
-              case "hybrid":
-                // numeric view but show small chart under/next to number
                 return (
                   <div className="flex items-center gap-1.5">
-                    <span
-                      className={`px-2 py-0.5 rounded-full border border-slate-700/80 bg-slate-900/80 text-[11px] ${colorClass}`}
-                    >
-                      {latencyText}
-                    </span>
-                    <span className="hidden sm:inline-flex items-center gap-1 text-[10px] text-slate-400">
-                      <span className="text-slate-500">|</span>
-                      <span>{qualityText}</span>
-                    </span>
-                  </div>
-                );
-              case "classic":
-              default:
-                return (
-                  <>
-                    <span
-                      className={`px-2 py-0.5 rounded-full border border-slate-700/80 bg-slate-900/80 text-[11px] ${colorClass}`}
-                    >
-                      {latencyText}
-                    </span>
-                    <span className="text-[10px] text-slate-400">
-                      {qualityText}
-                    </span>
-                  </>
-                );
-            }
-          };
-
-          const renderHeaderLatencyBars = () => {
-            const qualityText = qualityLabel;
-            const levelPercent =
-              qualityLevel <= 0 ? 0 : (qualityLevel / 4) * 100;
-
-            switch (latencyStyleId) {
-              case "barsThick":
-                return (
-                  <div className="flex items-center gap-1">
-                    <div className="px-2 py-0.5 rounded-full border border-slate-600/80 bg-slate-950/80 text-[11px]">
-                      <div className="flex items-end gap-1">
+                    <div className="px-2 py-0.5 rounded-full border border-slate-700/80 bg-slate-950/80 text-[11px]">
+                      <div className="flex items-end gap-0.5">
                         {renderLatencyBars(currentLatency)}
                       </div>
                     </div>
-                    <span className="text-[10px] text-slate-300">
-                      {qualityText}
-                    </span>
-                  </div>
-                );
-              case "barsDense":
-                return (
-                  <div className="flex items-center gap-1.5">
-                    <div className="px-1.5 py-0.5 rounded-full border border-slate-700/80 bg-slate-950/80 text-[11px]">
-                      <div className="flex items-end gap-0.5 scale-y-110">
-                        {renderLatencyBars(currentLatency)}
-                      </div>
-                    </div>
-                    <span className="text-[10px] text-slate-300">
+                    <span className="hidden sm:inline text-[10px] text-slate-300">
                       {qualityText}
                     </span>
                   </div>
@@ -590,7 +523,7 @@ export default function Proxies() {
                         style={{ width: `${levelPercent}%` }}
                       />
                     </div>
-                    <span className="text-[10px] text-slate-300">
+                    <span className="hidden sm:inline text-[10px] text-slate-300">
                       {qualityText}
                     </span>
                   </div>
@@ -598,29 +531,25 @@ export default function Proxies() {
               case "hybrid":
                 return (
                   <div className="flex items-center gap-1.5">
-                    <div className="px-2 py-0.5 rounded-full border border-slate-700/80 bg-slate-950/80 text-[11px] flex items-center gap-1.5">
-                      <span className="text-[10px] text-slate-300">
-                        {latencyText}
-                      </span>
-                      <span className="text-slate-500">·</span>
+                    <span
+                      className={`px-2 py-0.5 rounded-full border border-slate-700/80 bg-slate-950/80 text-[11px] ${colorClass}`}
+                    >
+                      {latencyText}
+                    </span>
+                    <div className="hidden sm:flex items-end gap-0.5">
                       {renderLatencyBars(currentLatency)}
                     </div>
-                    <span className="hidden sm:inline text-[10px] text-slate-400">
-                      {qualityText}
-                    </span>
                   </div>
                 );
               case "classic":
-              case "pill":
-              case "chip":
-              case "dot":
-              case "quality":
               default:
                 return (
-                  <div className="flex items-center gap-1">
-                    <div className="px-2 py-0.5 rounded-full border border-slate-700/80 bg-slate-900/80 text-[11px]">
-                      {renderLatencyBars(currentLatency)}
-                    </div>
+                  <div className="flex items-center gap-1.5">
+                    <span
+                      className={`px-2 py-0.5 rounded-full border border-slate-700/80 bg-slate-900/80 text-[11px] ${colorClass}`}
+                    >
+                      {latencyText}
+                    </span>
                     <span className="text-[10px] text-slate-400">
                       {qualityText}
                     </span>
@@ -643,9 +572,7 @@ export default function Proxies() {
                   <span className="text-sm font-semibold text-slate-100">
                     {name}
                   </span>
-                  {latencyView === "number"
-                    ? renderHeaderLatencyNumber()
-                    : renderHeaderLatencyBars()}
+                  {renderHeaderLatencyIndicator()}
                 </div>
 
                 <div className="flex items-center gap-1">
