@@ -8,6 +8,10 @@ import LinesBackground from "./components/layout/LinesBackground";
 import ParticleNetworkBackground from "./components/layout/ParticleNetworkBackground";
 import MatrixRainBackground from "./components/layout/MatrixRainBackground";
 import StarfieldWarpBackground from "./components/layout/StarfieldWarpBackground";
+import BokehBackground from "./components/layout/BokehBackground";
+import GooeyBlobsBackground from "./components/layout/GooeyBlobsBackground";
+import HexGridBackground from "./components/layout/HexGridBackground";
+import GlitchBackground from "./components/layout/GlitchBackground";
 
 import Overview from "./pages/Overview";
 import Proxies from "./pages/Proxies";
@@ -78,20 +82,19 @@ export default function App() {
         theme.background || ""
       }`}
     >
-      {/* blur / glow background (skip on YACD theme to let gradient dominate) */}
-      {themeId !== "yacd" && (
+      {/* blur / glow background (skip on themes with strong custom background) */}
+      {!["yacd", "aurora", "pastel", "ocean", "terminal", "dusk", "sunset", "cyberpunk"].includes(
+        themeId
+      ) && (
         <div className="pointer-events-none fixed inset-0">
           <div className="absolute -top-40 -left-40 w-96 h-96 bg-sky-500/20 blur-3xl rounded-full" />
           <div className="absolute -bottom-40 -right-40 w-[28rem] h-[28rem] bg-emerald-500/15 blur-3xl rounded-full" />
         </div>
       )}
 
-      {themeId === "yacd" && (
-        // geometric mesh background (Type #2)
-        <TrianglesBackground />
-      )}
+      {themeId === "yacd" && <TrianglesBackground />}
 
-      {themeId === "pastel" && <StarsBackground />}
+      {themeId === "pastel" && <BokehBackground />}
 
       {themeId === "ocean" && <LinesBackground />}
 
@@ -100,6 +103,12 @@ export default function App() {
       {themeId === "matrix" && <MatrixRainBackground />}
 
       {themeId === "terminal" && <StarfieldWarpBackground />}
+
+      {themeId === "dusk" && <HexGridBackground />}
+
+      {themeId === "sunset" && <GooeyBlobsBackground />}
+
+      {themeId === "cyberpunk" && <GlitchBackground />}
 
       <AppLayout activePage={page} onChangePage={handleChangePage}>
         {renderPage()}

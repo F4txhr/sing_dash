@@ -54,19 +54,18 @@ export const THEMES = {
       "bg-white/8 backdrop-blur-xl border border-emerald-300/50 shadow-[0_0_40px_-18px_rgba(45,212,191,0.8)]",
     bottomNav:
       "border border-emerald-300/50 bg-slate-950/80 backdrop-blur-xl shadow-[0_0_40px_-20px_rgba(45,212,191,0.9)]",
-    background:
-      "bg-slate-950 bg-[radial-gradient(circle_at_bottom,_#5e26,_#020617)]",
-    latencyDisplayy: "number"
+    background: "bg-aurora-anim",
+    latencyDisplay: "number"
   },
   sunset: {
     id: "sunset",
-    name: "Sunset",
+    name: "Sunset Gooey",
     card:
-      "rounded-2xl bg-gradient-to-br from-orange-500/10 via-rose-500/10 to-slate-900/90 border border-orange-400/40 shadow-[0_0_32px_-16px_rgba(251,146,60,0.9)]",
+      "rounded-2xl bg-transparent backdrop-blur-xl border border-orange-300/50 shadow-[0_0_32px_-16px_rgba(251,146,60,0.9)]",
     sidebar:
-      "bg-gradient-to-b from-slate-950 via-slate-950/90 to-rose-950/90 border border-orange-400/40",
+      "bg-slate-950/75 backdrop-blur-xl border border-orange-300/50 shadow-[0_0_40px_-18px_rgba(251,146,60,0.9)]",
     bottomNav:
-      "border border-orange-400/40 bg-slate-950/95 shadow-[0_0_40px_-18px_rgba(251,146,60,0.9)]",
+      "border border-orange-300/50 bg-slate-950/90 backdrop-blur-xl shadow-[0_0_40px_-18px_rgba(251,146,60,0.9)]",
     background:
       "bg-slate-950 bg-[radial-gradient(circle_at_top,_#fb923c2b,_#020617)]",
     latencyDisplay: "number"
@@ -77,32 +76,32 @@ export const THEMES = {
     card:
       "rounded-2xl bg-transparent backdrop-blur-xl border border-emerald-400/40 shadow-[0_0_24px_-12px_rgba(74,222,128,0.7)]",
     sidebar:
-      "bg-black border border-emerald-400/40 shadow-[0_0_28px_-14px_rgba(74,222,128,0.7)]",
+      "bg-black/80 backdrop-blur-xl border border-emerald-400/40 shadow-[0_0_28px_-14px_rgba(74,222,128,0.7)]",
     bottomNav:
-      "border border-emerald-400/40 bg-black shadow-[0_0_24px_-12px_rgba(74,222,128,0.7)]",
-    backgroundnd: "bg-black",
+      "border border-emerald-400/40 bg-black/90 backdrop-blur-xl shadow-[0_0_24px_-12px_rgba(74,222,128,0.7)]",
+    background: "bg-black",
     latencyDisplay: "number"
   },
   pastel: {
     id: "pastel",
-    name: "Pastel Glass",
+    name: "Pastel Bokeh",
     card:
-      "rounded-2xl bg-transparent backdrop-blur-xl border border-sky-200/40 shadow-[0_0_24px_-12px_rgba(125,211,252,0.7)]",
+      "rounded-2xl bg-transparent backdrop-blur-xl border border-sky-200/40 shadow-[0_0_28px_-14px_rgba(125,211,252,0.9)]",
     sidebar:
-      "bg-white/8 backdrop-blur-xl border border-sky-200/40 shadow-[0_0_30px_-14px_rgba(125,211,252,0.7)]",
+      "bg-slate-950/70 backdrop-blur-xl border border-sky-200/40 shadow-[0_0_36px_-16px_rgba(125,211,252,0.9)]",
     bottomNav:
-      "border border-sky-200/40 bg-slate-950/80 backdrop-blur-xl shadow-[0_0_24px_-12px_rgba(125,211,252,0.7)]",
+      "border border-sky-200/40 bg-slate-950/80 backdrop-blur-xl shadow-[0_0_28px_-14px_rgba(125,211,252,0.9)]",
     background:
       "bg-slate-950 bg-[radial-gradient(circle_at_top,_#38bdf81f,_#020617)]",
     latencyDisplay: "number"
   },
   ocean: {
     id: "ocean",
-    name: "Ocean Glass",
+    name: "Topology Ocean",
     card:
       "rounded-2xl bg-transparent backdrop-blur-xl border border-cyan-300/40 shadow-[0_0_32px_-16px_rgba(34,211,238,0.8)]",
     sidebar:
-      "bg-white/8 backdrop-blur-xlder border-cyan-300/40 shadow-[0_0_40px_-18px_rgba(34,211,238,0.8)]",
+      "bg-slate-950/70 backdrop-blur-xl border border-cyan-300/40 shadow-[0_0_40px_-18px_rgba(34,211,238,0.8)]",
     bottomNav:
       "border border-cyan-300/40 bg-slate-950/80 backdrop-blur-xl shadow-[0_0_32px_-18px_rgba(34,211,238,0.8)]",
     background:
@@ -111,13 +110,13 @@ export const THEMES = {
   },
   cyberpunk: {
     id: "cyberpunk",
-    name: "Cyberpunk",
+    name: "Cyberpunk Glitch",
     card:
-      "rounded-2xl bg-slate-950/95 border border-fuchsia-400/50 shadow-[0_0_40px_-16px_rgba(244,114,182,0.9)]",
+      "rounded-2xl bg-transparent backdrop-blur-xl border border-fuchsia-400/50 shadow-[0_0_40px_-16px_rgba(244,114,182,0.9)]",
     sidebar:
-      "bg-slate-950/95 border border-fuchsia-400/50 shadow-[0_0_48px_-20px_rgba(244,114,182,0.9)]",
+      "bg-slate-950/75 backdrop-blur-xl border border-fuchsia-400/50 shadow-[0_0_48px_-20px_rgba(244,114,182,0.9)]",
     bottomNav:
-      "border border-fuchsia-400/50 bg-slate-950 shadow-[0_0_40px_-18px_rgba(244,114,182,0.9)]",
+      "border border-fuchsia-400/50 bg-slate-950/90 backdrop-blur-xl shadow-[0_0_40px_-18px_rgba(244,114,182,0.9)]",
     background:
       "bg-slate-950 bg-[radial-gradient(circle_at_top,_#e879f92b,_#020617)]",
     latencyDisplay: "number"
@@ -139,11 +138,11 @@ export const THEMES = {
     id: "yacd",
     name: "YACD Glass",
     card:
-      "rounded-2xl bg-white/5 backdrop-blur-[12px] border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.35)]",
+      "rounded-2xl bg-transparent backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.35)]",
     sidebar:
-      "bg-white/10 backdrop-blurr-[16px] border border-white/25 shadow-[0_10px_40px_rgba(0,0,0,0.35)]",
+      "bg-white/10 backdrop-blur-xl border border-white/25 shadow-[0_10px_40px_rgba(0,0,0,0.35)]",
     bottomNav:
-      "border border-white/20 bg-white/10 backdrop-blur-[14px] shadow-[0_10px_32px_rgba(0,0,0,0.4)]",
+      "border border-white/20 bg-white/10 backdrop-blur-xl shadow-[0_10px_32px_rgba(0,0,0,0.4)]",
     background: "bg-yacd-gradient bg-geo-anim",
     latencyDisplay: "number"
   }

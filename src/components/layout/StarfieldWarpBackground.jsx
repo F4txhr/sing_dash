@@ -1,18 +1,16 @@
 import { useEffect, useRef } from "react";
 
-const STAR_COUNT = 220;
+const STAR_COUNT = 260;
 
 function createStars(width, height) {
   const stars = [];
-  const halfW = width / 2;
-  const halfH = height / 2;
+  const maxDepth = 3;
   for (let i = 0; i < STAR_COUNT; i++) {
-    const angle = Math.random() * Math.PI * 2;
-    const radius = Math.random() * Math.max(halfW, halfH);
     stars.push({
-      angle,
-      radius,
-      speed: 0.04 + Math.random() * 0.06
+      x: Math.random() * width,
+      y: Math.random() * height,
+      depth: 1 + Math.random() * (maxDepth - 1),
+      speed: 0.12 + Math.random() * 0.18
     });
   }
   return stars;
@@ -47,35 +45,30 @@ export default function StarfieldWarpBackground() {
     let frameId;
 
     const render = () => {
-      ctx.fillStyle = "rgba(3,7,18,0.85)";
+      ctx.fillStyle = "rgba(3,7,18,0.9)";
       ctx.fillRect(0, 0, width, height);
 
-      const cx = width / 2;
-      const cy = height / 2;
-
-      ctx.lineWidth = 1;
-
       for (const star of stars) {
-        star.radius += star.speed * Math.max(width, height);
+        const depthFactor = star.depth;
+        const vx = (star.x - width / 2) * 0.0004 * depthFactor;
+        const vy = (star.y - height / 2) * 0.0004 * depthFactor;
 
-        if (star.radius > Math.max(width, height)) {
-          star.radius = Math.random() * 40;
-          star.angle = Math.random() * Math.PI * 2;
+        star.x += vx * star.speed * 60;
+        star.y += vy * star.speed * 60;
+
+        if (star.x < -10 || star.x > width + 10 || star.y < -10 || star.y > height + 10) {
+          star.x = Math.random() * width;
+          star.y = Math.random() * height;
+          star.depth = 1 + Math.random() * 2;
         }
 
-        const prevR = star.radius - star.speed * Math.max(width, height);
-        const x1 = cx + Math.cos(star.angle) * prevR;
-        const y1 = cy + Math.sin(star.angle) * prevR;
-        const x2 = cx + Math.cos(star.angle) * star.radius;
-        const y2 = cy + Math.sin(star.angle) * star.radius;
-
-        const brightness = Math.min(1, star.radius / (Math.max(width, height) * 0.8));
-        ctx.strokeStyle = `rgba(148, 163, 184, ${0.2 + brightness * 0.8})`;
+        const size = 0.4 + (3 / depthFactor);
+        const alpha = 0.25 + (1.5 / depthFactor);
 
         ctx.beginPath();
-        ctx.moveTo(x1, y1);
-        ctx.lineTo(x2, y2);
-        ctx.stroke();
+        ctx.fillStyle = `rgba(148,163,184,${alpha})`;
+        ctx.arc(star.x, star.y, size, 0, Math.PI * 2);
+        ctx.fill();
       }
 
       frameId = requestAnimationFrame(render);

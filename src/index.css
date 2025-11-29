@@ -243,3 +243,191 @@ body {
   width: 100%;
   height: 100%;
 }
+
+/* Bokeh background for pastel theme */
+.bokeh-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.bokeh-orb {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(22px);
+  opacity: 0.95;
+  mix-blend-mode: screen;
+  animation-name: bokehFloat;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+@keyframes bokehFloat {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(var(--drift-x, 16px), var(--drift-y, -12px), 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Gooey blobs background for sunset theme */
+.gooey-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.gooey-blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(32px);
+  opacity: 0.9;
+  mix-blend-mode: screen;
+  animation-name: gooeyDrift;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+@keyframes gooeyDrift {
+  0% {
+    transform: translate3d(-6px, 4px, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(10px, -10px, 0) scale(1.08);
+  }
+  100% {
+    transform: translate3d(-6px, 4px, 0) scale(1);
+  }
+}
+
+/* Hex grid background for dusk theme */
+.hex-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-color: #020617;
+  background-image:
+    radial-gradient(circle at 100% 150%, rgba(129, 140, 248, 0.1) 0, rgba(15, 23, 42, 0) 60%),
+    radial-gradient(circle at 0 0, rgba(129, 140, 248, 0.18) 0, rgba(15, 23, 42, 0) 55%),
+    linear-gradient(
+      30deg,
+      rgba(148, 163, 184, 0.25) 12%,
+      transparent 12.5%,
+      transparent 87%,
+      rgba(148, 163, 184, 0.25) 87.5%,
+      rgba(148, 163, 184, 0.8) 100%
+    ),
+    linear-gradient(
+      150deg,
+      rgba(148, 163, 184, 0.25) 12%,
+      transparent 12.5%,
+      transparent 87%,
+      rgba(148, 163, 184, 0.25) 87.5%,
+      rgba(148, 163, 184, 0.8) 100%
+    ),
+    linear-gradient(
+      90deg,
+      rgba(148, 163, 184, 0.3) 2%,
+      transparent 2.5%,
+      transparent 97%,
+      rgba(148, 163, 184, 0.3) 97%,
+      rgba(148, 163, 184, 0.7) 100%
+    );
+  background-size: 80px 140px, 120px 200px, 80px 140px, 80px 140px, 4px 4px;
+  background-position: 0 0, 50% 0, 0 0, 0 0, 0 0;
+  animation: hexDrift 26s linear infinite;
+}
+
+@keyframes hexDrift {
+  0% {
+    background-position: 0 0, 50% 0, 0 0, 0 0, 0 0;
+  }
+  50% {
+    background-position: 10px 20px, 60% 10px, 10px 20px, -10px -10px, 0 0;
+  }
+  100% {
+    background-position: 0 0, 50% 0, 0 0, 0 0, 0 0;
+  }
+}
+
+/* Glitch + scanline background for cyberpunk */
+.glitch-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.glitch-line {
+  position: absolute;
+  left: -10%;
+  width: 120%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(236, 72, 153, 0.55),
+    rgba(59, 130, 246, 0.7),
+    transparent
+  );
+  mix-blend-mode: screen;
+  opacity: 0.75;
+  animation-name: glitchLineMove;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes glitchLineMove {
+  0% {
+    transform: translate3d(-8px, 0, 0);
+  }
+  50% {
+    transform: translate3d(8px, 0, 0);
+  }
+  100% {
+    transform: translate3d(-8px, 0, 0);
+  }
+}
+
+.glitch-scanlines {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(
+    to bottom,
+    rgba(15, 23, 42, 0.3) 0,
+    rgba(15, 23, 42, 0.3) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  background-size: 100% 4px;
+  mix-blend-mode: soft-light;
+  opacity: 0.8;
+  animation: scanlineScroll 6s linear infinite;
+}
+
+@keyframes scanlineScroll {
+  0% {
+    background-position-y: 0;
+  }
+  100% {
+    background-position-y: 100%;
+  }
+}
+
+.glitch-noise {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle at 0 0, rgba(148, 163, 184, 0.15) 0, transparent 60%),
+    radial-gradient(circle at 100% 100%, rgba(236, 72, 153, 0.18) 0, transparent 55%);
+  mix-blend-mode: soft-light;
+  opacity: 0.4;
+}
