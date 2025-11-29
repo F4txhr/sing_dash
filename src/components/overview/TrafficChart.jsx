@@ -1,4 +1,3 @@
-import { useState } from "react";
 import Card from "../ui/Card";
 import { formatSpeed } from "../../lib/utils";
 import { useTheme } from "../../lib/themeContext";
@@ -42,6 +41,25 @@ const TRAFFIC_PALETTES = {
   }
 };
 
+const TRAFFIC_MODE_BY_THEME = {
+  glass: "line",
+  solid: "line",
+  neon: "line",
+  dusk: "line",
+  aurora: "line",
+  sunset: "bars",
+  terminal: "line",
+  pastel: "line",
+  ocean: "bars",
+  cyberpunk: "bars",
+  matrix: "bars",
+  yacd: "line"
+};
+
+function getTrafficModeForTheme(themeId) {
+  return TRAFFIC_MODE_BY_THEME[themeId] || "line";
+}
+
 export default function TrafficChart({ history }) {
   // hitung max value dari history untuk scaling
   const maxVal = history.reduce(
@@ -49,38 +67,17 @@ export default function TrafficChart({ history }) {
     0
   );
   const safeMax = maxVal || 1; // hindari bagi 0
-  const [mode, setMode] = useState("line"); // 'line' | 'bars'
   const { themeId } = useTheme();
   const palette = TRAFFIC_PALETTES[themeId] || TRAFFIC_PALETTES.default;
+  const mode = getTrafficModeForTheme(themeId);
 
   return (
     <Card
       title="Traffic"
       className="lg:col-span-2"
       headerRight={
-        <div className="flex items-center gap-1 text-[10px] text-slate-400">
-          <button
-            type="button"
-            className={`px-2 py-0.5 rounded-full border ${
-              mode === "line"
-                ? "border-sky-400 bg-sky-500/20 text-sky-100"
-                : "border-transparent text-slate-400 hover:text-sky-100 hover:bg-slate-800/70"
-            }`}
-            onClick={() => setMode("line")}
-          >
-            Line
-          </button>
-          <button
-            type="button"
-            className={`px-2 py-0.5 rounded-full border ${
-              mode === "bars"
-                ? "border-sky-400 bg-sky-500/20 text-sky-100"
-                : "border-transparent text-slate-400 hover:text-sky-100 hover:bg-slate-800/70"
-            }`}
-            onClick={() => setMode("bars")}
-          >
-            Bars
-          </button>
+        <div className="text-[10px] text-slate-400">
+          {mode === "bars" ? "Chart: bars" : "Chart: line"}
         </div>
       }
     >

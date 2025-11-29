@@ -3,7 +3,6 @@ import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
 import { getProxies, apiPut, getProxyDelay } from "../lib/clashApi";
 import { useTheme } from "../lib/themeContext";
-import { useLatencyStyle } from "../lib/latencyStyleContext";
 
 const LATENCY_TEST_URL = "http://www.gstatic.com/generate_204";
 
@@ -77,8 +76,27 @@ const LATENCY_BAR_CONFIG = {
   default: { count: 4, heights: [4, 6, 8, 10] }
 };
 
+const THEME_LATENCY_VARIANT = {
+  glass: "classic",
+  solid: "classic",
+  neon: "hybrid",
+  dusk: "dot",
+  aurora: "chip",
+  sunset: "barProgress",
+  terminal: "quality",
+  pastel: "pill",
+  ocean: "barsThin",
+  cyberpunk: "barsDense",
+  matrix: "barsThick",
+  yacd: "pill"
+};
+
 function getLatencyPalette(themeId) {
   return LATENCY_PALETTES[themeId] || LATENCY_PALETTES.default;
+}
+
+function getLatencyVariantForTheme(themeId) {
+  return THEME_LATENCY_VARIANT[themeId] || "classic";
 }
 
 function getLatencyBarConfig(themeId) {
@@ -119,7 +137,6 @@ export default function Proxies() {
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
   const { themeId } = useTheme();
-  const { latencyStyleId } = useLatencyStyle();
 
   const [latency, setLatency] = useState({});
   const [testingGroup, setTestingGroup] = useState("");
@@ -379,6 +396,8 @@ export default function Proxies() {
           const showDetails =
             viewMode === "advanced" && !collapsed && allNames.length > 0;
 
+          const latencyVariant = getLatencyVariantForTheme(themeId);
+
           const latencyText =
             currentLatency === "error"
               ? "ERR"
@@ -452,7 +471,7 @@ export default function Proxies() {
             const levelPercent =
               qualityLevel <= 0 ? 0 : (qualityLevel / 4) * 100;
 
-            switch (latencyStyleId) {
+            switch (latencyVariant) {
               case "pill":
                 return (
                   <div className="flex items-center gap-1.5">
