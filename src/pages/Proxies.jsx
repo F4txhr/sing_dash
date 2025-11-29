@@ -3,6 +3,7 @@ import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
 import { getProxies, apiPut, getProxyDelay } from "../lib/clashApi";
 import { useTheme } from "../lib/themeContext";
+import { useLatencyStyle } from "../lib/latencyStyleContext";
 
 const LATENCY_TEST_URL = "http://www.gstatic.com/generate_204";
 
@@ -118,6 +119,7 @@ export default function Proxies() {
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
   const { themeId } = useTheme();
+  const { latencyStyleId } = useLatencyStyle();
 
   const [latency, setLatency] = useState({});
   const [testingGroup, setTestingGroup] = useState("");
@@ -171,6 +173,21 @@ export default function Proxies() {
     }, intervalSec * 1000);
     return () => clearInterval(id);
   }, [autoRefresh, intervalSec]);
+
+  // adjust default view when latency style changes
+  useEffect(() => {
+    if (
+      latencyStyleId === "barsThin" ||
+      latencyStyleId === "barsThick" ||
+      latencyStyleId === "barsDense" ||
+      latencyStyleId === "barProgress" ||
+      latencyStyleId === "hybrid"
+    ) {
+      setLatencyView("bars");
+    } else {
+      setLatencyView("number");
+    }
+  }, [latencyStyleId]);
 
   const handleSwitch = async (group, proxy) => {
     await apiPut(`/proxies/${encodeURIComponent(group)}`, { name: proxy });
@@ -375,6 +392,24 @@ export default function Proxies() {
           const showDetails =
             viewMode === "advanced" && !collapsed && allNames.length > 0;
 
+          const latencyText =
+            currentLatency === "error"
+              ? "ERR"
+              : currentLatency == null
+              ? "-"
+              : `${currentLatency} ms`;
+          const qualityLabel = latencyQualityLabel(currentLatency);
+          const qualityLevel =
+            currentLatency === "error" || currentLatency == null
+              ? 0
+              : currentLatency < 80
+              ? 4
+              : currentLatency < 150
+              ? 3
+              : currentLatency < 250
+              ? 2
+              : 1;
+
           const renderLatencyBars = (val) => {
             const palette = getLatencyPalette(themeId);
             const config = getLatencyBarConfig(themeId);
@@ -424,6 +459,176 @@ export default function Proxies() {
             );
           };
 
+          const renderHeaderLatencyNumber = () => {
+            const colorClass = getLatencyColor(currentLatency, themeId);
+            const qualityText = qualityLabel;
+
+            switch (latencyStyleId) {
+              case "pill":
+                return (
+                  <>
+                    <span
+                      className={`px-2.5 py-0.5 rounded-full text-[11px] border border-sky-500/60 bg-gradient-to-r from-sky-500/20 via-emerald-500/10 to-fuchsia-500/20 ${colorClass}`}
+                    >
+                      {latencyText}
+                    </span>
+                    <span className="text-[10px] text-slate-300">
+                      {qualityText}
+                    </span>
+                  </>
+                );
+              case "chip":
+                return (
+                  <div className="flex flex-col gap-0.5">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] border border-slate-600/80 bg-slate-900/80 text-slate-100">
+                      {qualityText}
+                    </span>
+                    <span className={`text-[10px] ${colorClass}`}>
+                      {latencyText}
+                    </span>
+                  </div>
+                );
+              case "dot":
+                return (
+                  <div className="flex items-center gap-1.5">
+                    <span
+                      className={`w-2.5 h-2.5 rounded-full shadow-inner ${qualityDotClass(
+                        currentLatency,
+                        themeId
+                      )}`}
+                    />
+                    <span className={`text-[11px] ${colorClass}`}>
+                      {latencyText}
+                    </span>
+                  </div>
+                );
+              case "quality":
+                return (
+                  <div className="flex flex-col gap-0.5">
+                    <span className="px-2 py-0.5 rounded-full text-[11px] border border-slate-600/80 bg-slate-900/80 text-slate-100">
+                      {qualityText}
+                    </span>
+                    <span className="text-[10px] text-slate-400">
+                      {latencyText}
+                    </span>
+                  </div>
+                );
+              case "barsThin":
+              case "barsThick":
+              case "barsDense":
+              case "barProgress":
+              case "hybrid":
+                // numeric view but show small chart under/next to number
+                return (
+                  <div className="flex items-center gap-1.5">
+                    <span
+                      className={`px-2 py-0.5 rounded-full border border-slate-700/80 bg-slate-900/80 text-[11px] ${colorClass}`}
+                    >
+                      {latencyText}
+                    </span>
+                    <span className="hidden sm:inline-flex items-center gap-1 text-[10px] text-slate-400">
+                      <span className="text-slate-500">|</span>
+                      <span>{qualityText}</span>
+                    </span>
+                  </div>
+                );
+              case "classic":
+              default:
+                return (
+                  <>
+                    <span
+                      className={`px-2 py-0.5 rounded-full border border-slate-700/80 bg-slate-900/80 text-[11px] ${colorClass}`}
+                    >
+                      {latencyText}
+                    </span>
+                    <span className="text-[10px] text-slate-400">
+                      {qualityText}
+                    </span>
+                  </>
+                );
+            }
+          };
+
+          const renderHeaderLatencyBars = () => {
+            const qualityText = qualityLabel;
+            const levelPercent =
+              qualityLevel <= 0 ? 0 : (qualityLevel / 4) * 100;
+
+            switch (latencyStyleId) {
+              case "barsThick":
+                return (
+                  <div className="flex items-center gap-1">
+                    <div className="px-2 py-0.5 rounded-full border border-slate-600/80 bg-slate-950/80 text-[11px]">
+                      <div className="flex items-end gap-1">
+                        {renderLatencyBars(currentLatency)}
+                      </div>
+                    </div>
+                    <span className="text-[10px] text-slate-300">
+                      {qualityText}
+                    </span>
+                  </div>
+                );
+              case "barsDense":
+                return (
+                  <div className="flex items-center gap-1.5">
+                    <div className="px-1.5 py-0.5 rounded-full border border-slate-700/80 bg-slate-950/80 text-[11px]">
+                      <div className="flex items-end gap-0.5 scale-y-110">
+                        {renderLatencyBars(currentLatency)}
+                      </div>
+                    </div>
+                    <span className="text-[10px] text-slate-300">
+                      {qualityText}
+                    </span>
+                  </div>
+                );
+              case "barProgress":
+                return (
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-20 h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-sky-400"
+                        style={{ width: `${levelPercent}%` }}
+                      />
+                    </div>
+                    <span className="text-[10px] text-slate-300">
+                      {qualityText}
+                    </span>
+                  </div>
+                );
+              case "hybrid":
+                return (
+                  <div className="flex items-center gap-1.5">
+                    <div className="px-2 py-0.5 rounded-full border border-slate-700/80 bg-slate-950/80 text-[11px] flex items-center gap-1.5">
+                      <span className="text-[10px] text-slate-300">
+                        {latencyText}
+                      </span>
+                      <span className="text-slate-500">·</span>
+                      {renderLatencyBars(currentLatency)}
+                    </div>
+                    <span className="hidden sm:inline text-[10px] text-slate-400">
+                      {qualityText}
+                    </span>
+                  </div>
+                );
+              case "classic":
+              case "pill":
+              case "chip":
+              case "dot":
+              case "quality":
+              default:
+                return (
+                  <div className="flex items-center gap-1">
+                    <div className="px-2 py-0.5 rounded-full border border-slate-700/80 bg-slate-900/80 text-[11px]">
+                      {renderLatencyBars(currentLatency)}
+                    </div>
+                    <span className="text-[10px] text-slate-400">
+                      {qualityText}
+                    </span>
+                  </div>
+                );
+            }
+          };
+
           return (
             <Card key={name} className="flex flex-col gap-2">
               {/* header card: quality dot + nama + latency + Test all + hide */}
@@ -438,34 +643,9 @@ export default function Proxies() {
                   <span className="text-sm font-semibold text-slate-100">
                     {name}
                   </span>
-                  {latencyView === "number" ? (
-                    <>
-                      <span
-                        className={`px-2 py-0.5 rounded-full border border-slate-700/80 bg-slate-900/80 text-[11px] ${getLatencyColor(
-                          currentLatency,
-                          themeId
-                        )}`}
-                      >
-                        {currentLatency === "error"
-                          ? "ERR"
-                          : currentLatency == null
-                          ? "-"
-                          : `${currentLatency} ms`}
-                      </span>
-                      <span className="text-[10px] text-slate-400">
-                        {latencyQualityLabel(currentLatency)}
-                      </span>
-                    </>
-                  ) : (
-                    <div className="flex items-center gap-1">
-                      <div className="px-2 py-0.5 rounded-full border border-slate-700/80 bg-slate-900/80 text-[11px]">
-                        {renderLatencyBars(currentLatency)}
-                      </div>
-                      <span className="text-[10px] text-slate-400">
-                        {latencyQualityLabel(currentLatency)}
-                      </span>
-                    </div>
-                  )}
+                  {latencyView === "number"
+                    ? renderHeaderLatencyNumber()
+                    : renderHeaderLatencyBars()}
                 </div>
 
                 <div className="flex items-center gap-1">

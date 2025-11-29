@@ -10,6 +10,8 @@ import { useLayout } from "../lib/layoutContext";
 import { LAYOUTS } from "../lib/layouts";
 import { useIconSet } from "../lib/iconContext";
 import { ICON_SETS } from "../lib/icons";
+import { useLatencyStyle } from "../lib/latencyStyleContext";
+import { LATENCY_STYLES } from "../lib/latencyStyles";
 
 export default function SettingsPage() {
   const [apiCfg, setApiCfgState] = useState(getApiConfig());
@@ -21,6 +23,7 @@ export default function SettingsPage() {
   const { themeId, setThemeId } = useTheme();
   const { layoutId, setLayoutId } = useLayout();
   const { iconSetId, setIconSetId } = useIconSet();
+  const { latencyStyleId, setLatencyStyleId } = useLatencyStyle();
 
   const loadCfg = async (updateStatus = false) => {
     try {
@@ -120,39 +123,44 @@ export default function SettingsPage() {
           </div>
         </Card>
 
-        <Card title="Theme & Icons">
-          <div className="space-y-3 text-xs">
-            <div className="space-y-1">
-              <div className="text-slate-400">Theme</div>
-              <select
+        <Card title="Theme & Indicators">
+         <cdiv className="space-y-3 text-xs">
+           <cdiv className="space-y-1">
+             <cdiv className="text-slate-400">The</>
+div>
+             <cselect
                 className="w-full rounded-2xl bg-slate-950/40 border border-slate-700/80 px-3 py-2 text-xs outline-none focus:border-sky-500"
                 value={themeId}
                 onChange={(e) => setThemeId(e.target.value)}
               >
                 {Object.values(THEMES).map((t) => (
-                  <option key={t.id} value={t.id}>
+                 <ooption key={t.id} value={t.id}>
                     {t.name}
-                  </option>
+                </iooption>
                 ))}
-              </select>
-            </div>
-            <div className="space-y-1">
-              <div className="text-slate-400">Icon set</div>
-              <select
+            </ecselect>
+          </>
+div>
+           <cdiv className="space-y-1">
+             <cdiv className="text-slate-400">Icon s</>
+div>
+             <cselect
                 className="w-full rounded-2xl bg-slate-950/40 border border-slate-700/80 px-3 py-2 text-xs outline-none focus:border-sky-500"
                 value={iconSetId}
                 onChange={(e) => setIconSetId(e.target.value)}
               >
                 {Object.values(ICON_SETS).map((set) => (
-                  <option key={set.id} value={set.id}>
+                 <ooption key={set.id} value={set.id}>
                     {set.name}
-                  </option>
+                </iooption>
                 ))}
-              </select>
-            </div>
-          </div>
-        </Card>
-
+            </ecselect>
+          </>
+div>
+           < div className="space-y-1">
+             < div className="text-slate-400">Latency indicat</ordiv>
+             < select
+                className="w-full rounded-2xl
         <Card title="API Settings">
           <div className="space-y-3 text-xs">
             <div className="space-y-1">
