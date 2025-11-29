@@ -7,6 +7,7 @@ import StarsBackground from "./components/layout/StarsBackground";
 import LinesBackground from "./components/layout/LinesBackground";
 import ParticleNetworkBackground from "./components/layout/ParticleNetworkBackground";
 import MatrixRainBackground from "./components/layout/MatrixRainBackground";
+import StarfieldWarpBackground from "./components/layout/StarfieldWarpBackground";
 
 import Overview from "./pages/Overview";
 import Proxies from "./pages/Proxies";
@@ -97,6 +98,8 @@ export default function App() {
       {themeId === "neon" && <ParticleNetworkBackground />}
 
       {themeId === "matrix" && <MatrixRainBackground />}
+
+      {themeId === "terminal" && <StarfieldWarpBackground />}
 
       <AppLayout activePage={page} onChangePage={handleChangePage}>
         {renderPage()}

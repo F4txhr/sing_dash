@@ -47,10 +47,10 @@ export default function ParticleNetworkBackground() {
     const render = () => {
       ctx.clearRect(0, 0, width, height);
 
-      // subtle background tint
+      // subtle background tint behind network
       const bgGrad = ctx.createLinearGradient(0, 0, width, height);
-      bgGrad.addColorStop(0, "rgba(15,23,42,0.9)");
-      bgGrad.addColorStop(1, "rgba(8,47,73,0.9)");
+      bgGrad.addColorStop(0, "rgba(2,6,23,0.95)");
+      bgGrad.addColorStop(1, "rgba(6,16,18,0.95)");
       ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, width, height);
 
@@ -65,7 +65,7 @@ export default function ParticleNetworkBackground() {
         if (p.y > height) p.y = 0;
       }
 
-      // draw connections
+      // draw connections (neon green)
       for (let i = 0; i < POINT_COUNT; i++) {
         for (let j = i + 1; j < POINT_COUNT; j++) {
           const a = points[i];
@@ -75,7 +75,7 @@ export default function ParticleNetworkBackground() {
           const dist = Math.sqrt(dx * dx + dy * dy);
           if (dist < MAX_DISTANCE) {
             const alpha = 1 - dist / MAX_DISTANCE;
-            ctx.strokeStyle = `rgba(56,189,248,${alpha * 0.6})`;
+            ctx.strokeStyle = `rgba(52,211,153,${alpha * 0.7})`;
             ctx.lineWidth = 1;
             ctx.beginPath();
             ctx.moveTo(a.x, a.y);
@@ -85,7 +85,7 @@ export default function ParticleNetworkBackground() {
         }
       }
 
-      // draw points
+      // draw nodes (glowing neon)
       for (const p of points) {
         const gradient = ctx.createRadialGradient(
           p.x,
@@ -93,13 +93,13 @@ export default function ParticleNetworkBackground() {
           0,
           p.x,
           p.y,
-          6
+          7
         );
-        gradient.addColorStop(0, "rgba(34,211,238,0.9)");
-        gradient.addColorStop(1, "rgba(34,211,238,0)");
+        gradient.addColorStop(0, "rgba(74,222,128,0.95)");
+        gradient.addColorStop(1, "rgba(74,222,128,0)");
         ctx.fillStyle = gradient;
         ctx.beginPath();
-        ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+        ctx.arc(p.x, p.y, 2.2, 0, Math.PI * 2);
         ctx.fill();
       }
 
