@@ -23,9 +23,9 @@ export const THEMES = {
     id: "neon",
     name: "Neon",
     card:
-      "rounded-2xl bg-slate-950/90 border border-sky-500/40 shadow-[0_0_30px_-12px_rgba(56,189,248,0.9)]",
+      "rounded-2xl bg-white/5 backdrop-blur-xl border border-sky-500/40 shadow-[0_0_30px_-12px_rgba(56,189,248,0.9)]",
     sidebar:
-      "bg-slate-950/95 border border-sky-500/40 shadow-[0_0_35px_-16px_rgba(56,189,248,0.9)]",
+      "bg-slate-950/90 border border-sky-500/40 shadow-[0_0_35px_-16px_rgba(56,189,248,0.9)]",
     bottomNav:
       "border border-sky-500/40 bg-slate-950/95 shadow-[0_0_30px_-18px_rgba(56,189,248,0.8)]",
     background:
@@ -49,14 +49,14 @@ export const THEMES = {
     id: "aurora",
     name: "Aurora Glass",
     card:
-      "rounded-2xl bg-white/8 backdrop-blur-xl border border-emerald-300/50 shadow-[0_0_40px_-18px_rgba(45,212,191,0.8)]",
+      "rounded-2xl bg-white/5 backdrop-blur-xl border border-emerald-300/50 shadow-[0_0_40px_-18px_rgba(45,212,191,0.8)]",
     sidebar:
-      "bg-white/10 backdrop-blur-xl border border-emerald-300/50 shadow-[0_0_40px_-18px_rgba(45,212,191,0.8)]",
+      "bg-white/8 backdrop-blur-xl border border-emerald-300/50 shadow-[0_0_40px_-18px_rgba(45,212,191,0.8)]",
     bottomNav:
       "border border-emerald-300/50 bg-slate-950/80 backdrop-blur-xl shadow-[0_0_40px_-20px_rgba(45,212,191,0.9)]",
     background:
       "bg-slate-950 bg-[radial-gradient(circle_at_bottom,_#22c55e26,_#020617)]",
-    latencyDisplay: "number"
+    latencyDisplayy: "number"
   },
   sunset: {
     id: "sunset",
@@ -75,7 +75,7 @@ export const THEMES = {
     id: "terminal",
     name: "Terminal",
     card:
-      "rounded-2xl bg-black border border-emerald-400/40 shadow-[0_0_24px_-12px_rgba(74,222,128,0.7)]",
+      "rounded-2xl bg-emerald-500/5 backdrop-blur-xl border border-emerald-400/40 shadow-[0_0_24px_-12px_rgba(74,222,128,0.7)]",
     sidebar:
       "bg-black border border-emerald-400/40 shadow-[0_0_28px_-14px_rgba(74,222,128,0.7)]",
     bottomNav:
@@ -87,9 +87,9 @@ export const THEMES = {
     id: "pastel",
     name: "Pastel Glass",
     card:
-      "rounded-2xl bg-white/8 backdrop-blur-xl border border-sky-200/40 shadow-[0_0_24px_-12px_rgba(125,211,252,0.7)]",
+      "rounded-2xl bg-white/5 backdrop-blur-xl border border-sky-200/40 shadow-[0_0_24px_-12px_rgba(125,211,252,0.7)]",
     sidebar:
-      "bg-white/10 backdrop-blur-xl border border-sky-200/40 shadow-[0_0_30px_-14px_rgba(125,211,252,0.7)]",
+      "bg-white/8 backdrop-blur-xl border border-sky-200/40 shadow-[0_0_30px_-14px_rgba(125,211,252,0.7)]",
     bottomNav:
       "border border-sky-200/40 bg-slate-950/80 backdrop-blur-xl shadow-[0_0_24px_-12px_rgba(125,211,252,0.7)]",
     background:
@@ -100,9 +100,9 @@ export const THEMES = {
     id: "ocean",
     name: "Ocean Glass",
     card:
-      "rounded-2xl bg-white/8 backdrop-blur-xl border border-cyan-300/40 shadow-[0_0_32px_-16px_rgba(34,211,238,0.8)]",
+      "rounded-2xl bg-white/5 backdrop-blur-xl border border-cyan-300/40 shadow-[0_0_32px_-16px_rgba(34,211,238,0.8)]",
     sidebar:
-      "bg-white/10 backdrop-blur-xl border border-cyan-300/40 shadow-[0_0_40px_-18px_rgba(34,211,238,0.8)]",
+      "bg-white/8 backdrop-blur-xl border border-cyan-300/40 shadow-[0_0_40px_-18px_rgba(34,211,238,0.8)]",
     bottomNav:
       "border border-cyan-300/40 bg-slate-950/80 backdrop-blur-xl shadow-[0_0_32px_-18px_rgba(34,211,238,0.8)]",
     background:
@@ -126,9 +126,9 @@ export const THEMES = {
     id: "matrix",
     name: "Matrix",
     card:
-      "rounded-2xl bg-black border border-emerald-500/50 shadow-[0_0_36px_-18px_rgba(34,197,94,0.9)]",
+      "rounded-2xl bg-emerald-500/5 backdrop-blur-xl border border-emerald-500/50 shadow-[0_0_36px_-18px_rgba(34,197,94,0.9)]",
     sidebar:
-      "bg-black border border-emerald-500/50 shadow-[0_0_44px_-20px_rgba(34,197,94,0.9)]",
+      "bg-black border border-emerald-500/50 shadow-[7,94,0.9)]",
     bottomNav:
       "border border-emerald-500/50 bg-black shadow-[0_0_36px_-18px_rgba(34,197,94,0.9)]",
     background:
@@ -139,9 +139,9 @@ export const THEMES = {
     id: "yacd",
     name: "YACD Glass",
     card:
-      "rounded-2xl bg-white/10 backdrop-blur-[12px] border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.35)]",
+      "rounded-2xl bg-white/5 backdrop-blur-[12px] border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.35)]",
     sidebar:
-      "bg-white/12 backdrop-blur-[16px] border border-white/25 shadow-[0_10px_40px_rgba(0,0,0,0.35)]",
+      "bg-white/10 backdrop-blurr-[16px] border border-white/25 shadow-[0_10px_40px_rgba(0,0,0,0.35)]",
     bottomNav:
       "border border-white/20 bg-white/10 backdrop-blur-[14px] shadow-[0_10px_32px_rgba(0,0,0,0.4)]",
     background: "bg-yacd-gradient bg-geo-anim",
