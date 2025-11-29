@@ -5,6 +5,8 @@ import { useTheme } from "./lib/themeContext";
 import TrianglesBackground from "./components/layout/TrianglesBackground";
 import StarsBackground from "./components/layout/StarsBackground";
 import LinesBackground from "./components/layout/LinesBackground";
+import ParticleNetworkBackground from "./components/layout/ParticleNetworkBackground";
+import MatrixRainBackground from "./components/layout/MatrixRainBackground";
 
 import Overview from "./pages/Overview";
 import Proxies from "./pages/Proxies";
@@ -84,12 +86,17 @@ export default function App() {
       )}
 
       {themeId === "yacd" && (
-        // geometric animated background behind content
+        // geometric mesh background (Type #2)
         <TrianglesBackground />
       )}
 
       {themeId === "pastel" && <StarsBackground />}
+
       {themeId === "ocean" && <LinesBackground />}
+
+      {themeId === "neon" && <ParticleNetworkBackground />}
+
+      {themeId === "matrix" && <MatrixRainBackground />}
 
       <AppLayout activePage={page} onChangePage={handleChangePage}>
         {renderPage()}
