@@ -124,43 +124,51 @@ export default function SettingsPage() {
         </Card>
 
         <Card title="Theme & Indicators">
-         <cdiv className="space-y-3 text-xs">
-           <cdiv className="space-y-1">
-             <cdiv className="text-slate-400">The</>
-div>
-             <cselect
+          <div className="space-y-3 text-xs">
+            <div className="space-y-1">
+              <div className="text-slate-400">Theme</div>
+              <select
                 className="w-full rounded-2xl bg-slate-950/40 border border-slate-700/80 px-3 py-2 text-xs outline-none focus:border-sky-500"
                 value={themeId}
                 onChange={(e) => setThemeId(e.target.value)}
               >
                 {Object.values(THEMES).map((t) => (
-                 <ooption key={t.id} value={t.id}>
+                  <option key={t.id} value={t.id}>
                     {t.name}
-                </iooption>
+                  </option>
                 ))}
-            </ecselect>
-          </>
-div>
-           <cdiv className="space-y-1">
-             <cdiv className="text-slate-400">Icon s</>
-div>
-             <cselect
+              </select>
+            </div>
+            <div className="space-y-1">
+              <div className="text-slate-400">Icon set</div>
+              <select
                 className="w-full rounded-2xl bg-slate-950/40 border border-slate-700/80 px-3 py-2 text-xs outline-none focus:border-sky-500"
                 value={iconSetId}
                 onChange={(e) => setIconSetId(e.target.value)}
               >
                 {Object.values(ICON_SETS).map((set) => (
-                 <ooption key={set.id} value={set.id}>
+                  <option key={set.id} value={set.id}>
                     {set.name}
-                </iooption>
+                  </option>
                 ))}
-            </ecselect>
-          </>
-div>
-           < div className="space-y-1">
-             < div className="text-slate-400">Latency indicat</ordiv>
-             < select
-                className="w-full rounded-2xl
+              </select>
+            </div>
+            <div className="space-y-1">
+              <div className="text-slate-400">Latency indicator</div>
+              <select
+                className="w-full rounded-2xl bg-slate-950/40 border border-slate-700/80 px-3 py-2 text-xs outline-none focus:border-sky-500"
+                value={latencyStyleId}
+                onChange={(e) => setLatencyStyleId(e.target.value)}
+              >
+                {Object.values(LATENCY_STYLES).map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </Card>
         <Card title="API Settings">
           <div className="space-y-3 text-xs">
             <div className="space-y-1">
