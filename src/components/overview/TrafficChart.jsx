@@ -41,24 +41,7 @@ const TRAFFIC_PALETTES = {
   }
 };
 
-const TRAFFIC_MODE_BY_THEME = {
-  glass: "line",
-  solid: "line",
-  neon: "line",
-  dusk: "line",
-  aurora: "line",
-  sunset: "bars",
-  terminal: "line",
-  pastel: "line",
-  ocean: "bars",
-  cyberpunk: "bars",
-  matrix: "bars",
-  yacd: "line"
-};
 
-function getTrafficModeForTheme(themeId) {
-  return TRAFFIC_MODE_BY_THEME[themeId] || "line";
-}
 
 export default function TrafficChart({ history }) {
   // hitung max value dari history untuk scaling
@@ -69,17 +52,11 @@ export default function TrafficChart({ history }) {
   const safeMax = maxVal || 1; // hindari bagi 0
   const { themeId } = useTheme();
   const palette = TRAFFIC_PALETTES[themeId] || TRAFFIC_PALETTES.default;
-  const mode = getTrafficModeForTheme(themeId);
 
   return (
     <Card
       title="Traffic"
       className="lg:col-span-2"
-      headerRight={
-        <div className="text-[10px] text-slate-400">
-          {mode === "bars" ? "Chart: bars" : "Chart: line"}
-        </div>
-      }
     >
       <div className="flex flex-col gap-2 h-40 md:h-56">
         {/* Legend */}
@@ -163,36 +140,6 @@ export default function TrafficChart({ history }) {
                 const upPoints = makePoints("up");
                 const downPtsStr = downPoints.map((p) => `${p.x},${p.y}`).join(" ");
                 const upPtsStr = upPoints.map((p) => `${p.x},${p.y}`).join(" ");
-
-                if (mode === "bars") {
-                  const barWidth = 100 / (history.length * 1.6 || 1);
-                  return (
-                    <>
-                      {downPoints.map((p, idx) => (
-                        <rect
-                          key={`down-${idx}`}
-                          x={p.x - barWidth / 2}
-                          y={p.y}
-                          width={barWidth}
-                          height={38 - p.y}
-                          fill={palette.down}
-                          opacity="0.55"
-                        />
-                      ))}
-                      {upPoints.map((p, idx) => (
-                        <rect
-                          key={`up-${idx}`}
-                          x={p.x - barWidth / 2}
-                          y={p.y}
-                          width={barWidth}
-                          height={38 - p.y}
-                          fill={palette.up}
-                          opacity="0.45"
-                        />
-                      ))}
-                    </>
-                  );
-                }
 
                 return (
                   <>
