@@ -422,6 +422,32 @@ export default function Proxies() {
             const count = config.count;
             const heights = config.heights;
 
+            // map tinggi ke kelas Tailwind statis supaya tidak ada kelas dinamis
+            const heightClassFor = (h) => {
+              switch (h) {
+                case 3:
+                  return "h-[3px]";
+                case 4:
+                  return "h-[4px]";
+                case 6:
+                  return "h-[6px]";
+                case 7:
+                  return "h-[7px]";
+                case 8:
+                  return "h-[8px]";
+                case 9:
+                  return "h-[9px]";
+                case 10:
+                  return "h-[10px]";
+                case 12:
+                  return "h-[12px]";
+                case 13:
+                  return "h-[13px]";
+                default:
+                  return "h-[4px]";
+              }
+            };
+
             if (val === "error" || val == null) {
               return (
                 <span className="flex items-end gap-0.5">
@@ -448,8 +474,7 @@ export default function Proxies() {
                 {Array.from({ length: count }).map((_, idx) => {
                   const i = idx + 1;
                   const isActive = i <= level;
-                  const heightClass =
-                    heights[idx] != null ? `h-[${heights[idx]}px]` : "h-[4px]";
+                  const heightClass = heightClassFor(heights[idx]);
                   return (
                     <span
                       key={i}

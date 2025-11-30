@@ -248,10 +248,7 @@ export default function Overview() {
     memoryInfo?.heap_inuse ??
     null;
 
-  const memoryLimitBytes =
-    memoryInfo?.oslimit ??
-    memoryInfo?.limit ??
-    null;
+  
 
   // dianggap "Connected" kalau minimal ada traffic OR minimal ada 1 koneksi
   const isConnected = (!!traffic && (upSpeed || downSpeed)) || activeConns > 0;
