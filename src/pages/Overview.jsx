@@ -1,10 +1,9 @@
 import { useEffect, useState, useRef } from "react";
-import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
 import TrafficChart from "../components/overview/TrafficChart";
-import ConnectionsSnapshot from "../components/overview/ConnectionsSnapshot";
+import MemoryChart from "../components/overview/MemoryChart";
+import OverviewStats from "../components/overview/OverviewStats";
 import { getConnections, connectTraffic, connectMemory } from "../lib/clashApi";
-import { formatBytes, formatSpeed } from "../lib/utils";
 import { useConnectionStatus } from "../lib/connectionStatus";
 
 export default function Overview() {
@@ -24,6 +23,8 @@ export default function Overview() {
 
   // history buat grafik (array titik {t, up, down})
   const [history, setHistory] = useState([]);
+  // history memory untuk chart (array titik { t, inuse })
+  const [memoryHistory, setMemoryHistory] = useState([]);
 
   // 🔥 Traffic via WebSocket
   useEffect(() => {
@@ -164,6 +165,22 @@ export default function Overview() {
         try {
           const data = JSON.parse(evt.data);
           setMemoryInfo(data);
+          // simpan history untuk chart
+          const now = Date.now();
+          const inuse =
+            data.inuse ??
+            data.inUse ??
+            data.in_use ??
+            data.heapInuse ??
+            data.heap_inuse ??
+            null;
+          if (inuse != null) {
+            setMemoryHistory((prev) => {
+              const next = [...prev, { t: now, inuse }];
+              if (next.length > 150) next.shift();
+              return next;
+            });
+          }
         } catch (e) {
           console.warn("[Overview] invalid memory message:", evt.data, e);
         }
@@ -310,75 +327,20 @@ export default function Overview() {
         </div>
       )}
 
-      {/* KPI cards in Sing-box style layout */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <Card title="Status" className="flex flex-col justify-center">
-          <div className="text-[11px] md:text-xs text-slate-400 space-y-1">
-            <div className="flex items-center justify-between">
-              <span>Memory</span>
-              <span className="text-slate-100">
-                {memoryBytes != null ? formatBytes(memoryBytes) : "-"}
-              </span>
-            </div>
-            {memoryLimitBytes != null && (
-              <div className="flex items-center justify-between">
-                <span>Limit</span>
-                <span className="text-slate-100">
-                  {formatBytes(memoryLimitBytes)}
-                </span>
-              </div>
-            )}
-          </div>
-        </Card>
+      {/* Overview stats ala Yacd-meta (TrafficNow) */}
+      <OverviewStats
+        upSpeed={upSpeed}
+        downSpeed={downSpeed}
+        upTotal={upTotal}
+        downTotal={downTotal}
+        activeConns={activeConns}
+        memoryBytes={memoryBytes}
+      />
 
-        <Card title="Connections" className="flex flex-col justify-center">
-          <div className="text-[11px] md:text-xs text-slate-400 space-y-1">
-            <div className="flex items-center justify-between">
-              <span>Active</span>
-              <span className="text-slate-100">{activeConns}</span>
-            </div>
-          </div>
-        </Card>
-
-        <Card title="Traffic" className="flex flex-col justify-center">
-          <div className="text-[11px] md:text-xs text-slate-400 space-y-1">
-            <div className="flex items-center justify-between">
-              <span>Uplink</span>
-              <span className="text-slate-100">
-                {formatSpeed(upSpeed) || "-"}
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span>Downlink</span>
-              <span className="text-slate-100">
-                {formatSpeed(downSpeed) || "-"}
-              </span>
-            </div>
-          </div>
-        </Card>
-
-        <Card title="Traffic total" className="flex flex-col justify-center">
-          <div className="text-[11px] md:text-xs text-slate-400 space-y-1">
-            <div className="flex items-center justify-between">
-              <span>Uplink</span>
-              <span className="text-slate-100">
-                {formatBytes(upTotal)}
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span>Downlink</span>
-              <span className="text-slate-100">
-                {formatBytes(downTotal)}
-              </span>
-            </div>
-          </div>
-        </Card>
-      </div>
-
-      {/* Traffic chart & sample connections */}
-      <div className="grid gap-4 lg:grid-cols-3">
+      {/* Traffic + Memory charts ala Yacd-meta */}
+      <div className="mt-4 space-y-4">
         <TrafficChart history={history} />
-        <ConnectionsSnapshot conns={conns} />
+        <MemoryChart history={memoryHistory} />
       </div>
 
       {/* auto refresh info kecil di mobile */}
