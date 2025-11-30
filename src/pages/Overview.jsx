@@ -222,17 +222,6 @@ export default function Overview() {
   const activeConns =
     conns?.filter?.((c) => !c.closed && c.status !== "closed")?.length ?? 0;
 
-  // derive in/out connections if metadata available
-  const inboundConns =
-    conns?.filter?.(
-      (c) => c.inbound || c.metadata?.inbound || c.metadata?.inbound_name
-    )?.length ?? activeConns;
-
-  const outboundConns =
-    conns?.filter?.(
-      (c) => c.outbound || c.metadata?.outbound || c.metadata?.outbound_name
-    )?.length ?? 0;
-
   // memory usage (best-effort, backend may not provide)
   const memoryBytes =
     memoryInfo?.inuse ??
@@ -242,10 +231,9 @@ export default function Overview() {
     memoryInfo?.heap_inuse ??
     null;
 
-  const goroutines =
-    memoryInfo?.goroutines ??
-    memoryInfo?.num_goroutine ??
-    memoryInfo?.threads ??
+  const memoryLimitBytes =
+    memoryInfo?.oslimit ??
+    memoryInfo?.limit ??
     null;
 
   // dianggap "Connected" kalau minimal ada traffic OR minimal ada 1 koneksi
@@ -332,24 +320,22 @@ export default function Overview() {
                 {memoryBytes != null ? formatBytes(memoryBytes) : "-"}
               </span>
             </div>
-            <div className="flex items-center justify-between">
-              <span>Goroutines</span>
-              <span className="text-slate-100">
-                {goroutines != null ? goroutines : "-"}
-              </span>
-            </div>
+            {memoryLimitBytes != null && (
+              <div className="flex items-center justify-between">
+                <span>Limit</span>
+                <span className="text-slate-100">
+                  {formatBytes(memoryLimitBytes)}
+                </span>
+              </div>
+            )}
           </div>
         </Card>
 
         <Card title="Connections" className="flex flex-col justify-center">
           <div className="text-[11px] md:text-xs text-slate-400 space-y-1">
             <div className="flex items-center justify-between">
-              <span>Inbound</span>
-              <span className="text-slate-100">{inboundConns}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span>Outbound</span>
-              <span className="text-slate-100">{outboundConns}</span>
+              <span>Active</span>
+              <span className="text-slate-100">{activeConns}</span>
             </div>
           </div>
         </Card>
