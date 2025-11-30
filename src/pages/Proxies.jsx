@@ -269,7 +269,7 @@ export default function Proxies() {
           Proxies
         </h1>
 
-        <div className="flex flex-wrap items-center gap-2 justify-between md:justify-end">
+        <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2 sm:gap-2 md:justify-end">
           {/* view mode toggle */}
           <div className="flex items-center text-[11px] border border-slate-700/80 rounded-2xl bg-slate-950/60 overflow-hidden">
             <button
