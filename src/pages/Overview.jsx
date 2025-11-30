@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
+import StatCard from "../components/ui/StatCard";
 import TrafficChart from "../components/overview/TrafficChart";
 import ConnectionsSnapshot from "../components/overview/ConnectionsSnapshot";
 import { getConnections, connectTraffic } from "../lib/clashApi";
@@ -272,34 +273,29 @@ export default function Overview() {
       )}
 
       {/* KPI cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-5 gap-3">
-        <Card title="Upload" className="!p-3 md:!p-4 flex flex-col justify-between min-h-[64px] md:min-h-[72px]">
-          <div className="text-sm font-semibold">{formatSpeed(upSpeed)}</div>
-          <div className="text-[11px] text-slate-400 mt-0.5">
-            Current upload speed
-          </div>
-        </Card>
-
-        <Card title="Download" className="!p-3 md:!p-4 flex flex-col justify-between min-h-[64px] md:min-h-[72px]">
-          <div className="text-sm font-semibold">{formatSpeed(downSpeed)}</div>
-          <div className="text-[11px] text-slate-400 mt-0.5">
-            Current download speed
-          </div>
-        </Card>
-
-        {/* Upload total (from local calculation or backend, if available) */}
-        <Card title="Upload total" className="!p-3 md:!p-4 flex items-center min-h-[64px] md:min-h-[72px]">
-          <div className="text-sm font-semibold">{formatBytes(upTotal)}</div>
-        </Card>
-
-        {/* Download total */}
-        <Card title="Download total" className="!p-3 md:!p-4 flex items-center min-h-[64px] md:min-h-[72px]">
-          <div className="text-sm font-semibold">{formatBytes(downTotal)}</div>
-        </Card>
-
-        <Card title="Active connections" className="!p-3 md:!p-4 flex items-center min-h-[64px] md:min-h-[72px]">
-          <div className="text-sm font-semibold">{activeConns}</div>
-        </Card>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-5 gap-3">
+        <StatCard
+          label="Upload"
+          value={formatSpeed(upSpeed)}
+          hint="Current upload speed"
+        />
+        <StatCard
+          label="Download"
+          value={formatSpeed(downSpeed)}
+          hint="Current download speed"
+        />
+        <StatCard
+          label="Upload total"
+          value={formatBytes(upTotal)}
+        />
+        <StatCard
+          label="Download total"
+          value={formatBytes(downTotal)}
+        />
+        <StatCard
+          label="Active connections"
+          value={activeConns}
+        />
       </div>
 
       {/* Traffic chart & sample connections */}
