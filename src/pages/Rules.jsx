@@ -53,14 +53,9 @@ export default function Rules() {
   return (
     <div className="space-y-4">
       <header className="flex items-center justify-between gap-2">
-        <div>
-          <h1 className="text-lg md:text-xl font-semibold tracking-tight">
-            Rules
-          </h1>
-          <p className="text-xs text-slate-400">
-            Rules list from /rules (format follows the backend).
-          </p>
-        </div>
+        <h1 className="text-lg md:text-xl font-semibold tracking-tight">
+          Rules
+        </h1>
         <Button size="sm" onClick={load} disabled={loading}>
           {loading ? "Loading..." : "Refresh"}
         </Button>
