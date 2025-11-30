@@ -1,10 +1,9 @@
 import { useEffect, useState, useRef } from "react";
 import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
-import StatCard from "../components/ui/StatCard";
 import TrafficChart from "../components/overview/TrafficChart";
 import ConnectionsSnapshot from "../components/overview/ConnectionsSnapshot";
-import { getConnections, connectTraffic } from "../lib/clashApi";
+import { getConnections, connectTraffic, getMemoryStats } from "../lib/clashApi";
 import { formatBytes, formatSpeed } from "../lib/utils";
 import { useConnectionStatus } from "../lib/connectionStatus";
 
@@ -16,6 +15,7 @@ export default function Overview() {
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [intervalSec, setIntervalSec] = useState(5);
   const [tick, setTick] = useState(0); // indikator kecil di UI
+  const [memoryInfo, setMemoryInfo] = useState(null);
   const { setConnectionStatus } = useConnectionStatus();
 
   // total hasil kalkulasi lokal (menjumlah dari up/down)
@@ -155,6 +155,27 @@ export default function Overview() {
     loadConnections();
   }, []);
 
+  // optional: memory usage (if backend exposes /memory)
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadMemory = async () => {
+      try {
+        const m = await getMemoryStats();
+        if (cancelled) return;
+        setMemoryInfo(m);
+      } catch {
+        // ignore: backend may not expose /memory
+      }
+    };
+
+    loadMemory();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   useEffect(() => {
     if (!autoRefresh) return;
     const id = setInterval(() => {
@@ -197,6 +218,32 @@ export default function Overview() {
 
   const activeConns =
     conns?.filter?.((c) => !c.closed && c.status !== "closed")?.length ?? 0;
+
+  // derive in/out connections if metadata available
+  const inboundConns =
+    conns?.filter?.(
+      (c) => c.inbound || c.metadata?.inbound || c.metadata?.inbound_name
+    )?.length ?? activeConns;
+
+  const outboundConns =
+    conns?.filter?.(
+      (c) => c.outbound || c.metadata?.outbound || c.metadata?.outbound_name
+    )?.length ?? 0;
+
+  // memory usage (best-effort, backend may not provide)
+  const memoryBytes =
+    memoryInfo?.inuse ??
+    memoryInfo?.inUse ??
+    memoryInfo?.in_use ??
+    memoryInfo?.heapInuse ??
+    memoryInfo?.heap_inuse ??
+    null;
+
+  const goroutines =
+    memoryInfo?.goroutines ??
+    memoryInfo?.num_goroutine ??
+    memoryInfo?.threads ??
+    null;
 
   // dianggap "Connected" kalau minimal ada traffic OR minimal ada 1 koneksi
   const isConnected = (!!traffic && (upSpeed || downSpeed)) || activeConns > 0;
@@ -272,30 +319,71 @@ export default function Overview() {
         </div>
       )}
 
-      {/* KPI cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-5 gap-3">
-        <StatCard
-          label="Upload"
-          value={formatSpeed(upSpeed)}
-          hint="Current upload speed"
-        />
-        <StatCard
-          label="Download"
-          value={formatSpeed(downSpeed)}
-          hint="Current download speed"
-        />
-        <StatCard
-          label="Upload total"
-          value={formatBytes(upTotal)}
-        />
-        <StatCard
-          label="Download total"
-          value={formatBytes(downTotal)}
-        />
-        <StatCard
-          label="Active connections"
-          value={activeConns}
-        />
+      {/* KPI cards in Sing-box style layout */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+        <Card title="Status" className="flex flex-col justify-center">
+          <div className="text-[11px] md:text-xs text-slate-400 space-y-1">
+            <div className="flex items-center justify-between">
+              <span>Memory</span>
+              <span className="text-slate-100">
+                {memoryBytes != null ? formatBytes(memoryBytes) : "-"}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span>Goroutines</span>
+              <span className="text-slate-100">
+                {goroutines != null ? goroutines : "-"}
+              </span>
+            </div>
+          </div>
+        </Card>
+
+        <Card title="Connections" className="flex flex-col justify-center">
+          <div className="text-[11px] md:text-xs text-slate-400 space-y-1">
+            <div className="flex items-center justify-between">
+              <span>Inbound</span>
+              <span className="text-slate-100">{inboundConns}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span>Outbound</span>
+              <span className="text-slate-100">{outboundConns}</span>
+            </div>
+          </div>
+        </Card>
+
+        <Card title="Traffic" className="flex flex-col justify-center">
+          <div className="text-[11px] md:text-xs text-slate-400 space-y-1">
+            <div className="flex items-center justify-between">
+              <span>Uplink</span>
+              <span className="text-slate-100">
+                {formatSpeed(upSpeed) || "-"}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span>Downlink</span>
+              <span className="text-slate-100">
+                {formatSpeed(downSpeed) || "-"}
+              </span>
+            </div>
+          </div>
+        </Card>
+
+        <Card title="Traffic total" className="flex flex-col justify-center">
+          <div className="text-[11px] md:text-xs text-slate-400 space-y-1">
+            <div className="flex items-center justify-between">
+              <span>Uplink</span>
+              <span className="text-slate-100">
+                {formatBytes(upTotal)}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span>Downlink</span>
+              <span className="text-slate-100">
+                {formatBytes(downTotal)}
+              </span>
+            </div>
+          </div>
+        </Card>
       </div>
 
       {/* Traffic chart & sample connections */}

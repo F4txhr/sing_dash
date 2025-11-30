@@ -40,6 +40,7 @@ export const updateConfig = (patch) => apiPut("/configs", patch);
 export const getProxies = () => apiGet("/proxies");
 export const getRules = () => apiGet("/rules");
 export const getConnections = () => apiGet("/connections");
+export const getMemoryStats = () => apiGet("/memory");
 
 /* 🔥 WebSocket traffic (up/down B/s) */
 export function connectTraffic() {
