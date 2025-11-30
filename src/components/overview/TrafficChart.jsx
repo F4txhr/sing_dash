@@ -65,137 +65,136 @@ export default function TrafficChart({ history }) {
             viewBox="0 0 100 40"
             preserveAspectRatio="none"
           >
-              <defs>
-                {/* glow tipis di belakang garis */}
-                <filter id="softGlow">
-                  <feGaussianBlur stdDeviation="0.5" result="blur" />
-                  <feColorMatrix
-                    in="blur"
-                    type="matrix"
-                    values="0 0 0 0 0.38  0 0 0 0 0.72  0 0 0 0 1  0 0 0 0.6 0"
+            <defs>
+              {/* glow tipis di belakang garis */}
+              <filter id="softGlow">
+                <feGaussianBlur stdDeviation="0.5" result="blur" />
+                <feColorMatrix
+                  in="blur"
+                  type="matrix"
+                  values="0 0 0 0 0.38  0 0 0 0 0.72  0 0 0 0 1  0 0 0 0.6 0"
+                />
+              </filter>
+            </defs>
+
+            {/* grid halus */}
+            <line
+              x1="0"
+              y1="20"
+              x2="100"
+              y2="20"
+              stroke={palette.gridMajor}
+              strokeWidth="0.4"
+            />
+            <line
+              x1="0"
+              y1="10"
+              x2="100"
+              y2="10"
+              stroke={palette.gridMinor}
+              strokeWidth="0.3"
+            />
+            <line
+              x1="0"
+              y1="30"
+              x2="100"
+              y2="30"
+              stroke={palette.gridMinor}
+              strokeWidth="0.3"
+            />
+
+            {(() => {
+              // scaling sedikit dihaluskan biar spike nggak terlalu tinggi
+              const makePoints = (key) =>
+                history.map((p, idx) => {
+                  const x = (idx / (history.length - 1 || 1)) * 100;
+                  const raw = Math.min(p[key] || 0, safeMax);
+                  const ratio = Math.sqrt(raw / safeMax || 0); // smoothing
+                  const y = 38 - ratio * 34; // 2px margin top/bottom
+                  return { x, y };
+                });
+
+              const downPoints = makePoints("down");
+              const upPoints = makePoints("up");
+
+              const downPtsStr = downPoints.map((p) => `${p.x},${p.y}`).join(" ");
+              const upPtsStr = upPoints.map((p) => `${p.x},${p.y}`).join(" ");
+
+              // area fill ala Chart.js (baseline di y=38)
+              const makeFillPoints = (points) => {
+                if (!points.length) return "";
+                const first = points[0];
+                const last = points[points.length - 1];
+                return `${first.x},38 ${points
+                  .map((p) => `${p.x},${p.y}`)
+                  .join(" ")} ${last.x},38`;
+              };
+
+              const downFill = makeFillPoints(downPoints);
+              const upFill = makeFillPoints(upPoints);
+
+              return (
+                <>
+                  {/* fill area (Down / Up) */}
+                  {downFill && (
+                    <polygon
+                      points={downFill}
+                      fill={palette.down}
+                      opacity="0.18"
+                    />
+                  )}
+                  {upFill && (
+                    <polygon
+                      points={upFill}
+                      fill={palette.up}
+                      opacity="0.14"
+                    />
+                  )}
+
+                  {/* glow */}
+                  <polyline
+                    points={downPtsStr}
+                    fill="none"
+                    stroke={palette.down}
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    filter="url(#softGlow)"
+                    opacity="0.7"
                   />
-                </filter>
-              </defs>
+                  <polyline
+                    points={upPtsStr}
+                    fill="none"
+                    stroke={palette.up}
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    filter="url(#softGlow)"
+                    opacity="0.6"
+                  />
 
-              {/* grid halus */}
-              <line
-                x1="0"
-                y1="20"
-                x2="100"
-                y2="20"
-                stroke={palette.gridMajor}
-                strokeWidth="0.4"
-              />
-              <line
-                x1="0"
-                y1="10"
-                x2="100"
-                y2="10"
-                stroke={palette.gridMinor}
-                strokeWidth="0.3"
-              />
-              <line
-                x1="0"
-                y1="30"
-                x2="100"
-                y2="30"
-                stroke={palette.gridMinor}
-                strokeWidth="0.3"
-              />
-
-              {(() => {
-                // scaling sedikit dihaluskan biar spike nggak terlalu tinggi
-                const makePoints = (key) =>
-                  history.map((p, idx) => {
-                    const x = (idx / (history.length - 1 || 1)) * 100;
-                    const raw = Math.min(p[key] || 0, safeMax);
-                    const ratio = Math.sqrt(raw / safeMax || 0); // smoothing
-                    const y = 38 - ratio * 34; // 2px margin top/bottom
-                    return { x, y };
-                  });
-
-                const downPoints = makePoints("down");
-                const upPoints = makePoints("up");
-
-                const downPtsStr = downPoints.map((p) => `${p.x},${p.y}`).join(" ");
-                const upPtsStr = upPoints.map((p) => `${p.x},${p.y}`).join(" ");
-
-                // area fill ala Chart.js (baseline di y=38)
-                const makeFillPoints = (points) => {
-                  if (!points.length) return "";
-                  const first = points[0];
-                  const last = points[points.length - 1];
-                  return `${first.x},38 ${points
-                    .map((p) => `${p.x},${p.y}`)
-                    .join(" ")} ${last.x},38`;
-                };
-
-                const downFill = makeFillPoints(downPoints);
-                const upFill = makeFillPoints(upPoints);
-
-                return (
-                  <>
-                    {/* fill area (Down / Up) */}
-                    {downFill && (
-                      <polygon
-                        points={downFill}
-                        fill={palette.down}
-                        opacity="0.18"
-                      />
-                    )}
-                    {upFill && (
-                      <polygon
-                        points={upFill}
-                        fill={palette.up}
-                        opacity="0.14"
-                      />
-                    )}
-
-                    {/* glow */}
-                    <polyline
-                      points={downPtsStr}
-                      fill="none"
-                      stroke={palette.down}
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      filter="url(#softGlow)"
-                      opacity="0.7"
-                    />
-                    <polyline
-                      points={upPtsStr}
-                      fill="none"
-                      stroke={palette.up}
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      filter="url(#softGlow)"
-                      opacity="0.6"
-                    />
-
-                    {/* garis utama */}
-                    <polyline
-                      points={downPtsStr}
-                      fill="none"
-                      stroke={palette.down}
-                      strokeWidth="1.2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <polyline
-                      points={upPtsStr}
-                      fill="none"
-                      stroke={palette.up}
-                      strokeWidth="1.1"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </>
-                );
-              })()}
-            </svg>
-          )}
-        </div>
+                  {/* garis utama */}
+                  <polyline
+                    points={downPtsStr}
+                    fill="none"
+                    stroke={palette.down}
+                    strokeWidth="1.2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <polyline
+                    points={upPtsStr}
+                    fill="none"
+                    stroke={palette.up}
+                    strokeWidth="1.1"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </>
+              );
+            })()}
+          </svg>
+        )}
       </div>
     </Card>
   );
