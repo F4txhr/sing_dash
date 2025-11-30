@@ -1,5 +1,4 @@
 import Card from "../ui/Card";
-import { formatSpeed } from "../../lib/utils";
 import { useTheme } from "../../lib/themeContext";
 
 const TRAFFIC_PALETTES = {
@@ -54,38 +53,18 @@ export default function TrafficChart({ history }) {
   const palette = TRAFFIC_PALETTES[themeId] || TRAFFIC_PALETTES.default;
 
   return (
-    <Card
-      title="Traffic"
-      className="lg:col-span-2"
-    >
-      <div className="flex flex-col gap-2 h-40 md:h-56">
-        {/* Legend */}
-        <div className="flex items-center gap-3 text-[11px] text-slate-400">
-          <div className="flex items-center gap-1">
-            <span className="w-3 h-1 rounded-full bg-sky-400/80" />
-            <span>Download</span>
+    <Card title="Traffic" className="lg:col-span-2">
+      <div className="h-40 sm:h-44 md:h-56 lg:h-60 rounded-2xl bg-slate-950/60 border border-slate-800/80 px-3 py-2 overflow-hidden">
+        {history.length < 2 ? (
+          <div className="w-full h-full flex items-center justify-center text-[11px] text-slate-500">
+            Waiting for traffic data...
           </div>
-          <div className="flex items-center gap-1">
-            <span className="w-3 h-1 rounded-full bg-violet-400/80" />
-            <span>Upload</span>
-          </div>
-          <div className="ml-auto text-[10px] text-slate-500">
-            Max: {formatSpeed(safeMax)}
-          </div>
-        </div>
-
-        {/* Chart area */}
-        <div className="flex-1 rounded-2xl bg-slate-950/60 border border-slate-800/80 px-3 py-2 overflow-hidden">
-          {history.length < 2 ? (
-            <div className="w-full h-full flex items-center justify-center text-[11px] text-slate-500">
-              Waiting for traffic data...
-            </div>
-          ) : (
-            <svg
-              className="w-full h-full"
-              viewBox="0 0 100 40"
-              preserveAspectRatio="none"
-            >
+        ) : (
+          <svg
+            className="w-full h-full"
+            viewBox="0 0 100 40"
+            preserveAspectRatio="none"
+          >
               <defs>
                 {/* glow tipis di belakang garis */}
                 <filter id="softGlow">
@@ -127,22 +106,51 @@ export default function TrafficChart({ history }) {
               {(() => {
                 // scaling sedikit dihaluskan biar spike nggak terlalu tinggi
                 const makePoints = (key) =>
-                  history
-                    .map((p, idx) => {
-                      const x = (idx / (history.length - 1 || 1)) * 100;
-                      const raw = Math.min(p[key] || 0, safeMax);
-                      const ratio = Math.sqrt(raw / safeMax || 0); // smoothing
-                      const y = 38 - ratio * 34; // 2px margin top/bottom
-                      return { x, y };
-                    });
+                  history.map((p, idx) => {
+                    const x = (idx / (history.length - 1 || 1)) * 100;
+                    const raw = Math.min(p[key] || 0, safeMax);
+                    const ratio = Math.sqrt(raw / safeMax || 0); // smoothing
+                    const y = 38 - ratio * 34; // 2px margin top/bottom
+                    return { x, y };
+                  });
 
                 const downPoints = makePoints("down");
                 const upPoints = makePoints("up");
+
                 const downPtsStr = downPoints.map((p) => `${p.x},${p.y}`).join(" ");
                 const upPtsStr = upPoints.map((p) => `${p.x},${p.y}`).join(" ");
 
+                // area fill ala Chart.js (baseline di y=38)
+                const makeFillPoints = (points) => {
+                  if (!points.length) return "";
+                  const first = points[0];
+                  const last = points[points.length - 1];
+                  return `${first.x},38 ${points
+                    .map((p) => `${p.x},${p.y}`)
+                    .join(" ")} ${last.x},38`;
+                };
+
+                const downFill = makeFillPoints(downPoints);
+                const upFill = makeFillPoints(upPoints);
+
                 return (
                   <>
+                    {/* fill area (Down / Up) */}
+                    {downFill && (
+                      <polygon
+                        points={downFill}
+                        fill={palette.down}
+                        opacity="0.18"
+                      />
+                    )}
+                    {upFill && (
+                      <polygon
+                        points={upFill}
+                        fill={palette.up}
+                        opacity="0.14"
+                      />
+                    )}
+
                     {/* glow */}
                     <polyline
                       points={downPtsStr}
