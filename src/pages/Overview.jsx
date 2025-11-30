@@ -320,7 +320,7 @@ export default function Overview() {
       )}
 
       {/* KPI cards in Sing-box style layout */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <Card title="Status" className="flex flex-col justify-center">
           <div className="text-[11px] md:text-xs text-slate-400 space-y-1">
             <div className="flex items-center justify-between">
