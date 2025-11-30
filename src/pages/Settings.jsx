@@ -3,34 +3,68 @@ import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
 import { getApiConfig, setApiConfig } from "../lib/apiConfig";
 import { getConfigs, updateConfig } from "../lib/clashApi";
+import { useConnectionStatus } from "../lib/connectionStatus";
+import { useTheme } from "../lib/themeContext";
+import { THEMES } from "../lib/themes";
+import { useLayout } from "../lib/layoutContext";
+import { LAYOUTS } from "../lib/layouts";
+import { useIconSet } from "../lib/iconContext";
+import { ICON_SETS } from "../lib/icons";
 
-export default function ConfigPage() {
+export default function SettingsPage() {
   const [apiCfg, setApiCfgState] = useState(getApiConfig());
   const [cfg, setCfg] = useState(null);
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
+  const { setConnectionStatus } = useConnectionStatus();
 
-  const loadCfg = async () => {
+  const { themeId, setThemeId } = useTheme();
+  const { layoutId, setLayoutId } = useLayout();
+  const { iconSetId, setIconSetId } = useIconSet();
+
+  const loadCfg = async (updateStatus = false) => {
     try {
       setLoading(true);
       setMsg("");
       const c = await getConfigs();
       setCfg(c);
+      if (updateStatus) {
+        setConnectionStatus({
+          status: "ok",
+          lastError: "",
+          lastChecked: new Date().toISOString()
+        });
+        setMsg("API OK: /configs loaded successfully.");
+      }
     } catch (e) {
-      setMsg("Error load /configs: " + e.message);
+      const message = e.message || String(e);
+      if (updateStatus) {
+        setConnectionStatus({
+          status: "error",
+          lastError: message,
+          lastChecked: new Date().toISOString()
+        });
+        setMsg("Error testing /configs: " + message);
+      } else {
+        setMsg("Error loading /configs: " + message);
+      }
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadCfg();
+    loadCfg(false);
   }, []);
 
   const handleSaveApi = () => {
     const merged = setApiConfig(apiCfg);
     setApiCfgState(merged);
-    setMsg("API config saved. Silakan refresh halaman lain.");
+    setMsg("API config saved. Please refresh the other pages.");
+  };
+
+  const handleTestConnection = () => {
+    loadCfg(true);
   };
 
   const handlePatchConfig = async () => {
@@ -52,14 +86,9 @@ export default function ConfigPage() {
   return (
     <div className="space-y-4">
       <header className="flex items-center justify-between gap-2">
-        <div>
-          <h1 className="text-lg md:text-xl font-semibold tracking-tight">
-            Config
-          </h1>
-          <p className="text-xs text-slate-400">
-            Pengaturan API & beberapa field /configs.
-          </p>
-        </div>
+        <h1 className="text-lg md:text-xl font-semibold tracking-tight">
+          Settings
+        </h1>
         <Button size="sm" onClick={loadCfg} disabled={loading}>
           {loading ? "Loading..." : "Reload /configs"}
         </Button>
@@ -72,10 +101,58 @@ export default function ConfigPage() {
       )}
 
       <div className="grid gap-4 md:grid-cols-2">
-        <Card
-          title="API Settings"
-          description="Base URL & secret Clash API (Sing-box)."
-        >
+        <Card title="Layout">
+          <div className="space-y-3 text-xs">
+            <div className="space-y-1">
+              <div className="text-slate-400">Layout mode</div>
+              <select
+                className="w-full rounded-2xl bg-slate-950/40 border border-slate-700/80 px-3 py-2 text-xs outline-none focus:border-sky-500"
+                value={layoutId}
+                onChange={(e) => setLayoutId(e.target.value)}
+              >
+                {Object.values(LAYOUTS).map((l) => (
+                  <option key={l.id} value={l.id}>
+                    {l.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </Card>
+
+        <Card title="Theme & Icons">
+          <div className="space-y-3 text-xs">
+            <div className="space-y-1">
+              <div className="text-slate-400">Theme</div>
+              <select
+                className="w-full rounded-2xl bg-slate-950/40 border border-slate-700/80 px-3 py-2 text-xs outline-none focus:border-sky-500"
+                value={themeId}
+                onChange={(e) => setThemeId(e.target.value)}
+              >
+                {Object.values(THEMES).map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-1">
+              <div className="text-slate-400">Icon set</div>
+              <select
+                className="w-full rounded-2xl bg-slate-950/40 border border-slate-700/80 px-3 py-2 text-xs outline-none focus:border-sky-500"
+                value={iconSetId}
+                onChange={(e) => setIconSetId(e.target.value)}
+              >
+                {Object.values(ICON_SETS).map((set) => (
+                  <option key={set.id} value={set.id}>
+                    {set.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </Card>
+        <Card title="API Settings">
           <div className="space-y-3 text-xs">
             <div className="space-y-1">
               <div className="text-slate-400">Base URL</div>
@@ -97,16 +174,23 @@ export default function ConfigPage() {
                 }
               />
             </div>
-            <Button size="sm" onClick={handleSaveApi}>
-              Save API settings
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button size="sm" onClick={handleSaveApi}>
+                Save API settings
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={handleTestConnection}
+                disabled={loading}
+              >
+                {loading ? "Testing..." : "Test connection"}
+              </Button>
+            </div>
           </div>
         </Card>
 
-        <Card
-          title="Runtime Config"
-          description="Mode & log level dari /configs."
-        >
+        <Card title="Runtime Config">
           {cfg ? (
             <div className="space-y-3 text-xs">
               <div className="space-y-1">
@@ -145,7 +229,7 @@ export default function ConfigPage() {
             </div>
           ) : (
             <div className="text-xs text-slate-400">
-              Belum ada data /configs.
+              No /configs data yet.
             </div>
           )}
         </Card>

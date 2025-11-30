@@ -50,6 +50,14 @@ export function connectTraffic() {
   return new WebSocket(url + "/traffic");
 }
 
+/* 🔥 WebSocket memory (inuse / oslimit) ala Yacd-meta */
+export function connectMemory() {
+  const cfg = getApiConfig();
+  let url = cfg.baseUrl.replace(/\/+$/, "");
+  url = url.replace(/^http/, "ws");
+  return new WebSocket(url + "/memory");
+}
+
 /* 🔥 WebSocket logs */
 export function connectLogs(level = "info") {
   const cfg = getApiConfig();

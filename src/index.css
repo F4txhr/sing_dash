@@ -19,3 +19,415 @@ body {
 ::-webkit-scrollbar-track {
   background: transparent;
 }
+
+/* Page transition */
+@keyframes pageFadeSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-transition {
+  animation: pageFadeSlideIn 200ms ease-out;
+}
+
+/* Animated backgrounds for some themes */
+@keyframes auroraDrift {
+  0% {
+    background-position: 0% 0%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 0%;
+  }
+}
+
+@keyframes yacdGradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes geoOrbit {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate3d(5px, -5px, 0) rotate(3deg);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+}
+
+.bg-aurora-anim {
+  background-image: radial-gradient(circle at bottom, rgba(34, 197, 94, 0.25), #020617);
+  background-size: 200% 200%;
+  animation: auroraDrift 28s linear infinite;
+}
+
+.bg-geo-anim {
+  position: relative;
+}
+
+.bg-geo-anim::before,
+.bg-geo-anim::after {
+  content: "";
+  position: absolute;
+  border-radius: 9999px;
+  mix-blend-mode: screen;
+  opacity: 0.8;
+}
+
+.bg-geo-anim::before {
+  width: 18rem;
+  height: 18rem;
+  background: radial-gradient(circle at center, rgba(56, 189, 248, 0.35), transparent);
+  top: -6rem;
+  right: -4rem;
+  animation: geoOrbit 22s ease-in-out infinite;
+}
+
+.bg-geo-anim::after {
+  width: 20rem;
+  height: 20rem;
+  background: radial-gradient(circle at center, rgba(244, 114, 182, 0.35), transparent);
+  bottom: -8rem;
+  left: -6rem;
+  animation: geoOrbit 30s ease-in-out infinite reverse;
+}
+
+.bg-yacd-gradient {
+  background-image: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+  background-size: 400% 400%;
+  animation: yacdGradientShift 15s ease infinite;
+}
+
+/* full-screen triangles background for YACD-like theme */
+.triangles-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.triangles-bg-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transition: opacity 3s ease;
+}
+
+.stars-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.star-dot {
+  position: absolute;
+  top: -10vh;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.8);
+  filter: blur(1px);
+  animation-name: starFall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes starFall {
+  0% {
+    transform: translate3d(0, -10vh, 0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(0, 115vh, 0);
+    opacity: 0;
+  }
+}
+
+.lines-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.line-segment {
+  position: absolute;
+  background: linear-gradient(
+    to right,
+    rgba(148, 163, 184, 0.1),
+    rgba(148, 163, 184, 0.7),
+    rgba(148, 163, 184, 0.1)
+  );
+  border-radius: 9999px;
+  animation-name: lineDrift;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+@keyframes lineDrift {
+  0% {
+    transform: translate3d(-10px, 0, 0) rotate(var(--line-angle, 0deg));
+    opacity: 0.3;
+  }
+  50% {
+    transform: translate3d(10px, 0, 0) rotate(var(--line-angle, 0deg));
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate3d(-10px, 0, 0) rotate(var(--line-angle, 0deg));
+    opacity: 0.3;
+  }
+}
+
+.network-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.network-bg-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.matrix-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.matrix-bg-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.warp-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.warp-bg-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Bokeh background for pastel theme */
+.bokeh-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.bokeh-orb {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(22px);
+  opacity: 0.95;
+  mix-blend-mode: screen;
+  animation-name: bokehFloat;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+@keyframes bokehFloat {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(var(--drift-x, 16px), var(--drift-y, -12px), 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Gooey blobs background for sunset theme */
+.gooey-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.gooey-blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(32px);
+  opacity: 0.9;
+  mix-blend-mode: screen;
+  animation-name: gooeyDrift;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+@keyframes gooeyDrift {
+  0% {
+    transform: translate3d(-6px, 4px, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(10px, -10px, 0) scale(1.08);
+  }
+  100% {
+    transform: translate3d(-6px, 4px, 0) scale(1);
+  }
+}
+
+/* Hex grid background for dusk theme */
+.hex-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-color: #020617;
+  background-image:
+    radial-gradient(circle at 100% 150%, rgba(129, 140, 248, 0.1) 0, rgba(15, 23, 42, 0) 60%),
+    radial-gradient(circle at 0 0, rgba(129, 140, 248, 0.18) 0, rgba(15, 23, 42, 0) 55%),
+    linear-gradient(
+      30deg,
+      rgba(148, 163, 184, 0.25) 12%,
+      transparent 12.5%,
+      transparent 87%,
+      rgba(148, 163, 184, 0.25) 87.5%,
+      rgba(148, 163, 184, 0.8) 100%
+    ),
+    linear-gradient(
+      150deg,
+      rgba(148, 163, 184, 0.25) 12%,
+      transparent 12.5%,
+      transparent 87%,
+      rgba(148, 163, 184, 0.25) 87.5%,
+      rgba(148, 163, 184, 0.8) 100%
+    ),
+    linear-gradient(
+      90deg,
+      rgba(148, 163, 184, 0.3) 2%,
+      transparent 2.5%,
+      transparent 97%,
+      rgba(148, 163, 184, 0.3) 97%,
+      rgba(148, 163, 184, 0.7) 100%
+    );
+  background-size: 80px 140px, 120px 200px, 80px 140px, 80px 140px, 4px 4px;
+  background-position: 0 0, 50% 0, 0 0, 0 0, 0 0;
+  animation: hexDrift 26s linear infinite;
+}
+
+@keyframes hexDrift {
+  0% {
+    background-position: 0 0, 50% 0, 0 0, 0 0, 0 0;
+  }
+  50% {
+    background-position: 10px 20px, 60% 10px, 10px 20px, -10px -10px, 0 0;
+  }
+  100% {
+    background-position: 0 0, 50% 0, 0 0, 0 0, 0 0;
+  }
+}
+
+/* Glitch + scanline background for cyberpunk */
+.glitch-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.glitch-line {
+  position: absolute;
+  left: -10%;
+  width: 120%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(236, 72, 153, 0.55),
+    rgba(59, 130, 246, 0.7),
+    transparent
+  );
+  mix-blend-mode: screen;
+  opacity: 0.75;
+  animation-name: glitchLineMove;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes glitchLineMove {
+  0% {
+    transform: translate3d(-8px, 0, 0);
+  }
+  50% {
+    transform: translate3d(8px, 0, 0);
+  }
+  100% {
+    transform: translate3d(-8px, 0, 0);
+  }
+}
+
+.glitch-scanlines {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(
+    to bottom,
+    rgba(15, 23, 42, 0.3) 0,
+    rgba(15, 23, 42, 0.3) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  background-size: 100% 4px;
+  mix-blend-mode: soft-light;
+  opacity: 0.8;
+  animation: scanlineScroll 6s linear infinite;
+}
+
+@keyframes scanlineScroll {
+  0% {
+    background-position-y: 0;
+  }
+  100% {
+    background-position-y: 100%;
+  }
+}
+
+.glitch-noise {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle at 0 0, rgba(148, 163, 184, 0.15) 0, transparent 60%),
+    radial-gradient(circle at 100% 100%, rgba(236, 72, 153, 0.18) 0, transparent 55%);
+  mix-blend-mode: soft-light;
+  opacity: 0.4;
+}

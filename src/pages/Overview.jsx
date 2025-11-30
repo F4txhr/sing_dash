@@ -1,26 +1,10 @@
 import { useEffect, useState, useRef } from "react";
-import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
-import { getConnections, connectTraffic } from "../lib/clashApi";
-
-// helper format byte
-function formatBytes(bytes) {
-  if (bytes == null || isNaN(bytes)) return "-";
-  const units = ["B", "KB", "MB", "GB", "TB"];
-  let i = 0;
-  let v = Number(bytes);
-  while (v >= 1024 && i < units.length - 1) {
-    v /= 1024;
-    i++;
-  }
-  return `${v.toFixed(2)} ${units[i]}`;
-}
-
-// helper format speed
-function formatSpeed(bytesPerSec) {
-  if (bytesPerSec == null || isNaN(bytesPerSec)) return "-";
-  return `${formatBytes(bytesPerSec)}/s`;
-}
+import TrafficChart from "../components/overview/TrafficChart";
+import MemoryChart from "../components/overview/MemoryChart";
+import OverviewStats from "../components/overview/OverviewStats";
+import { getConnections, connectTraffic, connectMemory } from "../lib/clashApi";
+import { useConnectionStatus } from "../lib/connectionStatus";
 
 export default function Overview() {
   const [traffic, setTraffic] = useState(null);
@@ -30,6 +14,8 @@ export default function Overview() {
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [intervalSec, setIntervalSec] = useState(5);
   const [tick, setTick] = useState(0); // indikator kecil di UI
+  const [memoryInfo, setMemoryInfo] = useState(null);
+  const { setConnectionStatus } = useConnectionStatus();
 
   // total hasil kalkulasi lokal (menjumlah dari up/down)
   const [calcTotal, setCalcTotal] = useState({ up: 0, down: 0 });
@@ -37,6 +23,8 @@ export default function Overview() {
 
   // history buat grafik (array titik {t, up, down})
   const [history, setHistory] = useState([]);
+  // history memory untuk chart (array titik { t, inuse })
+  const [memoryHistory, setMemoryHistory] = useState([]);
 
   // 🔥 Traffic via WebSocket
   useEffect(() => {
@@ -49,6 +37,11 @@ export default function Overview() {
       ws.onopen = () => {
         console.log("[Overview] traffic WS opened");
         setErr((e) => (e.startsWith("traffic") ? "" : e));
+        setConnectionStatus({
+          status: "ok",
+          lastError: "",
+          lastChecked: new Date().toISOString()
+        });
       };
 
       ws.onmessage = (evt) => {
@@ -101,8 +94,13 @@ export default function Overview() {
       ws.onerror = (e) => {
         console.error("[Overview] traffic WS error:", e);
         setErr(
-          (prev) => prev || "traffic websocket error (lihat console browser)",
+          (prev) => prev || "traffic websocket error (see browser console)",
         );
+        setConnectionStatus({
+          status: "error",
+          lastError: e?.message || "traffic websocket error",
+          lastChecked: new Date().toISOString()
+        });
       };
 
       ws.onclose = () => {
@@ -112,8 +110,13 @@ export default function Overview() {
       console.error("[Overview] failed to open traffic WS:", e);
       setErr(
         (prev) =>
-          prev || "failed to open traffic websocket (lihat console browser)",
+          prev || "failed to open traffic websocket (see browser console)",
       );
+      setConnectionStatus({
+        status: "error",
+        lastError: e?.message || "failed to open traffic websocket",
+        lastChecked: new Date().toISOString()
+      });
     }
 
     return () => {
@@ -131,9 +134,19 @@ export default function Overview() {
       const list = Array.isArray(c) ? c : c?.connections || [];
       setConns(list);
       setTick((x) => x + 1);
+      setConnectionStatus({
+        status: "ok",
+        lastError: "",
+        lastChecked: new Date().toISOString()
+      });
     } catch (e) {
       console.error("[Overview] getConnections error:", e);
       setErr((prev) => prev || e.message || String(e));
+      setConnectionStatus({
+        status: "error",
+        lastError: e?.message || String(e),
+        lastChecked: new Date().toISOString()
+      });
     } finally {
       setLoading(false);
     }
@@ -141,6 +154,46 @@ export default function Overview() {
 
   useEffect(() => {
     loadConnections();
+  }, []);
+
+  // optional: memory usage (if backend exposes /memory ala Yacd-meta)
+  useEffect(() => {
+    let ws;
+    try {
+      ws = connectMemory();
+      ws.onmessage = (evt) => {
+        try {
+          const data = JSON.parse(evt.data);
+          setMemoryInfo(data);
+          // simpan history untuk chart
+          const now = Date.now();
+          const inuse =
+            data.inuse ??
+            data.inUse ??
+            data.in_use ??
+            data.heapInuse ??
+            data.heap_inuse ??
+            null;
+          if (inuse != null) {
+            setMemoryHistory((prev) => {
+              const next = [...prev, { t: now, inuse }];
+              if (next.length > 150) next.shift();
+              return next;
+            });
+          }
+        } catch (e) {
+          console.warn("[Overview] invalid memory message:", evt.data, e);
+        }
+      };
+    } catch (e) {
+      console.warn("[Overview] failed to open memory WS:", e);
+    }
+
+    return () => {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.close();
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -186,43 +239,42 @@ export default function Overview() {
   const activeConns =
     conns?.filter?.((c) => !c.closed && c.status !== "closed")?.length ?? 0;
 
+  // memory usage (best-effort, backend may not provide)
+  const memoryBytes =
+    memoryInfo?.inuse ??
+    memoryInfo?.inUse ??
+    memoryInfo?.in_use ??
+    memoryInfo?.heapInuse ??
+    memoryInfo?.heap_inuse ??
+    null;
+
+  
+
   // dianggap "Connected" kalau minimal ada traffic OR minimal ada 1 koneksi
   const isConnected = (!!traffic && (upSpeed || downSpeed)) || activeConns > 0;
 
-  // ==== DATA UNTUK GRAFIK ====
-  const maxVal = history.reduce(
-    (max, p) => Math.max(max, p.up || 0, p.down || 0),
-    0,
-  );
-  const safeMax = maxVal || 1; // hindari bagi 0
-
   return (
     <div className="space-y-4">
-      {/* Header halaman */}
+      {/* Page header */}
       <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <h1 className="text-lg md:text-xl font-semibold tracking-tight">
-              Overview
-            </h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-lg md:text-xl font-semibold tracking-tight">
+            Overview
+          </h1>
+          <span
+            className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] border ${
+              isConnected
+                ? "border-emerald-400/60 text-emerald-300 bg-emerald-500/10"
+                : "border-rose-400/60 text-rose-300 bg-rose-500/10"
+            }`}
+          >
             <span
-              className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] border ${
-                isConnected
-                  ? "border-emerald-400/60 text-emerald-300 bg-emerald-500/10"
-                  : "border-rose-400/60 text-rose-300 bg-rose-500/10"
+              className={`w-1.5 h-1.5 rounded-full ${
+                isConnected ? "bg-emerald-400" : "bg-rose-400"
               }`}
-            >
-              <span
-                className={`w-1.5 h-1.5 rounded-full ${
-                  isConnected ? "bg-emerald-400" : "bg-rose-400"
-                }`}
-              />
-              {isConnected ? "Connected" : "Disconnected"}
-            </span>
-          </div>
-          <p className="text-xs text-slate-400">
-            Ringkasan trafik & koneksi Sing-box / Clash.
-          </p>
+            />
+            {isConnected ? "Connected" : "Disconnected"}
+          </span>
         </div>
 
         <div className="flex items-center gap-2">
@@ -272,219 +324,20 @@ export default function Overview() {
         </div>
       )}
 
-      {/* KPI cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-5 gap-3">
-        <Card title="Upload" className="!p-3 md:!p-4">
-          <div className="text-sm font-semibold">{formatSpeed(upSpeed)}</div>
-          <div className="text-[11px] text-slate-400 mt-0.5">
-            Kecepatan saat ini
-          </div>
-        </Card>
+      {/* Overview stats ala Yacd-meta (TrafficNow) */}
+      <OverviewStats
+        upSpeed={upSpeed}
+        downSpeed={downSpeed}
+        upTotal={upTotal}
+        downTotal={downTotal}
+        activeConns={activeConns}
+        memoryBytes={memoryBytes}
+      />
 
-        <Card title="Download" className="!p-3 md:!p-4">
-          <div className="text-sm font-semibold">{formatSpeed(downSpeed)}</div>
-          <div className="text-[11px] text-slate-400 mt-0.5">
-            Kecepatan saat ini
-          </div>
-        </Card>
-
-        {/* Upload Total (dari kalkulasi lokal atau dari backend jika ada) */}
-        <Card title="Upload Total" className="!p-3 md:!p-4">
-          <div className="text-sm font-semibold">{formatBytes(upTotal)}</div>
-          <div className="text-[11px] text-slate-400 mt-0.5">
-            Estimasi total upload (sejak buka halaman ini)
-          </div>
-        </Card>
-
-        {/* Download Total */}
-        <Card title="Download Total" className="!p-3 md:!p-4">
-          <div className="text-sm font-semibold">{formatBytes(downTotal)}</div>
-          <div className="text-[11px] text-slate-400 mt-0.5">
-            Estimasi total download (sejak buka halaman ini)
-          </div>
-        </Card>
-
-        <Card title="Active connections" className="!p-3 md:!p-4">
-          <div className="text-sm font-semibold">{activeConns}</div>
-          <div className="text-[11px] text-slate-400 mt-0.5">
-            Dari /connections
-          </div>
-        </Card>
-      </div>
-
-      {/* Traffic chart & sample connections */}
-      <div className="grid gap-4 lg:grid-cols-3">
-        <Card
-          title="Traffic"
-          description="Grafik sederhana dari /traffic (Up / Down) dalam beberapa detik terakhir."
-          className="lg:col-span-2"
-        >
-          <div className="flex flex-col gap-2 h-40 md:h-56">
-            {/* Legend */}
-            <div className="flex items-center gap-3 text-[11px] text-slate-400">
-              <div className="flex items-center gap-1">
-                <span className="w-3 h-1 rounded-full bg-sky-400/80" />
-                <span>Download</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <span className="w-3 h-1 rounded-full bg-violet-400/80" />
-                <span>Upload</span>
-              </div>
-              <div className="ml-auto text-[10px] text-slate-500">
-                Max: {formatSpeed(safeMax)}
-              </div>
-            </div>
-
-            {/* Chart area */}
-            <div className="flex-1 rounded-2xl bg-slate-950/60 border border-slate-800/80 px-3 py-2 overflow-hidden">
-              {history.length < 2 ? (
-                <div className="w-full h-full flex items-center justify-center text-[11px] text-slate-500">
-                  Menunggu data traffic...
-                </div>
-              ) : (
-                <svg
-                  className="w-full h-full"
-                  viewBox="0 0 100 40"
-                  preserveAspectRatio="none"
-                >
-                  <defs>
-                    {/* glow tipis di belakang garis */}
-                    <filter id="softGlow">
-                      <feGaussianBlur stdDeviation="0.5" result="blur" />
-                      <feColorMatrix
-                        in="blur"
-                        type="matrix"
-                        values="0 0 0 0 0.38  0 0 0 0 0.72  0 0 0 0 1  0 0 0 0.6 0"
-                      />
-                    </filter>
-                  </defs>
-
-                  {/* grid halus */}
-                  <line
-                    x1="0"
-                    y1="20"
-                    x2="100"
-                    y2="20"
-                    stroke="#1e293b"
-                    strokeWidth="0.4"
-                  />
-                  <line
-                    x1="0"
-                    y1="10"
-                    x2="100"
-                    y2="10"
-                    stroke="#020617"
-                    strokeWidth="0.3"
-                  />
-                  <line
-                    x1="0"
-                    y1="30"
-                    x2="100"
-                    y2="30"
-                    stroke="#020617"
-                    strokeWidth="0.3"
-                  />
-
-                  {(() => {
-                    // scaling sedikit dihaluskan biar spike nggak terlalu tinggi
-                    const makePoints = (key) =>
-                      history
-                        .map((p, idx) => {
-                          const x = (idx / (history.length - 1 || 1)) * 100;
-                          const raw = Math.min(p[key] || 0, safeMax);
-                          const ratio = Math.sqrt(raw / safeMax || 0); // smoothing
-                          const y = 38 - ratio * 34; // 2px margin top/bottom
-                          return `${x},${y}`;
-                        })
-                        .join(" ");
-
-                    const downPts = makePoints("down");
-                    const upPts = makePoints("up");
-
-                    return (
-                      <>
-                        {/* glow */}
-                        <polyline
-                          points={downPts}
-                          fill="none"
-                          stroke="#38bdf8"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          filter="url(#softGlow)"
-                          opacity="0.7"
-                        />
-                        <polyline
-                          points={upPts}
-                          fill="none"
-                          stroke="#a855f7"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          filter="url(#softGlow)"
-                          opacity="0.6"
-                        />
-
-                        {/* garis utama */}
-                        <polyline
-                          points={downPts}
-                          fill="none"
-                          stroke="#38bdf8"
-                          strokeWidth="1.2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                        <polyline
-                          points={upPts}
-                          fill="none"
-                          stroke="#a855f7"
-                          strokeWidth="1.1"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </>
-                    );
-                  })()}
-                </svg>
-              )}
-            </div>
-          </div>
-        </Card>
-
-        <Card
-          title="Connections snapshot"
-          description="Beberapa host dari /connections."
-        >
-          <div className="space-y-1 max-h-56 overflow-y-auto text-[11px]">
-            {conns && conns.length > 0 ? (
-              conns.slice(0, 10).map((c, idx) => (
-                <div
-                  key={idx}
-                  className="flex items-center justify-between gap-2 rounded-2xl bg-slate-950/60 border border-slate-800/80 px-2 py-1.5"
-                >
-                  <div className="min-w-0">
-                    <div className="truncate text-slate-100">
-                      {c.host || c.metadata?.host || "unknown"}
-                    </div>
-                    <div className="text-[10px] text-slate-400 truncate">
-                      {(c.network || c.metadata?.network || "")
-                        .toString()
-                        .toUpperCase()}{" "}
-                      •{" "}
-                      {c.chains?.join(" / ") || c.metadata?.chains?.join(" / ")}
-                    </div>
-                  </div>
-                  <div className="text-right text-[10px] text-slate-400 shrink-0">
-                    <div>↑ {formatBytes(c.upload || c.up)}</div>
-                    <div>↓ {formatBytes(c.download || c.down)}</div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="text-slate-500">Belum ada koneksi aktif.</div>
-            )}
-          </div>
-        </Card>
+      {/* Traffic + Memory charts ala Yacd-meta */}
+      <div className="mt-4 space-y-4">
+        <TrafficChart history={history} />
+        <MemoryChart history={memoryHistory} />
       </div>
 
       {/* auto refresh info kecil di mobile */}

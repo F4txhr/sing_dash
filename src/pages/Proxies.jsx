@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
 import { getProxies, apiPut, getProxyDelay } from "../lib/clashApi";
+import { useTheme } from "../lib/themeContext";
 
 const LATENCY_TEST_URL = "http://www.gstatic.com/generate_204";
 
@@ -25,28 +26,117 @@ function extractLatencyMap(proxiesObj) {
   return map;
 }
 
-function getLatencyColor(val) {
-  if (val === "error" || val === null || val === undefined)
-    return "text-slate-500";
-  if (val < 80) return "text-emerald-400";
-  if (val < 150) return "text-lime-300";
-  if (val < 250) return "text-yellow-300";
-  return "text-rose-400";
+const LATENCY_PALETTES = {
+  default: {
+    text: ["text-emerald-400", "text-lime-300", "text-yellow-300", "text-rose-400"],
+    bg: ["bg-emerald-400", "bg-lime-300", "bg-yellow-300", "bg-rose-400"],
+    bar: "bg-sky-400"
+  },
+  matrix: {
+    text: ["text-emerald-400", "text-emerald-300", "text-lime-300", "text-emerald-200"],
+    bg: ["bg-emerald-400", "bg-emerald-300", "bg-lime-300", "bg-emerald-200"],
+    bar: "bg-emerald-400"
+  },
+  terminal: {
+    text: ["text-emerald-400", "text-emerald-300", "text-lime-300", "text-emerald-200"],
+    bg: ["bg-emerald-400", "bg-emerald-300", "bg-lime-300", "bg-emerald-200"],
+    bar: "bg-emerald-400"
+  },
+  cyberpunk: {
+    text: ["text-fuchsia-300", "text-pink-300", "text-amber-300", "text-rose-400"],
+    bg: ["bg-fuchsia-400", "bg-pink-400", "bg-amber-300", "bg-rose-400"],
+    bar: "bg-fuchsia-400"
+  },
+  sunset: {
+    text: ["text-orange-300", "text-amber-300", "text-yellow-300", "text-rose-400"],
+    bg: ["bg-orange-400", "bg-amber-400", "bg-yellow-300", "bg-rose-400"],
+    bar: "bg-orange-400"
+  },
+  aurora: {
+    text: ["text-emerald-300", "text-emerald-200", "text-lime-300", "text-rose-400"],
+    bg: ["bg-emerald-400", "bg-emerald-300", "bg-lime-300", "bg-rose-400"],
+    bar: "bg-emerald-400"
+  },
+  ocean: {
+    text: ["text-cyan-300", "text-sky-300", "text-teal-300", "text-rose-400"],
+    bg: ["bg-cyan-400", "bg-sky-400", "bg-teal-400", "bg-rose-400"],
+    bar: "bg-cyan-400"
+  },
+  pastel: {
+    text: ["text-sky-300", "text-cyan-300", "text-emerald-300", "text-rose-400"],
+    bg: ["bg-sky-400", "bg-cyan-400", "bg-emerald-400", "bg-rose-400"],
+    bar: "bg-sky-400"
+  }
+};
+
+const LATENCY_BAR_CONFIG = {
+  matrix: { count: 5, heights: [4, 6, 8, 10, 12] },
+  cyberpunk: { count: 3, heights: [6, 9, 12] },
+  pastel: { count: 4, heights: [4, 7, 10, 13] },
+  default: { count: 4, heights: [4, 6, 8, 10] }
+};
+
+const THEME_LATENCY_VARIANT = {
+  glass: "classic",
+  solid: "classic",
+  neon: "hybrid",
+  dusk: "dot",
+  aurora: "chip",
+  sunset: "barProgress",
+  terminal: "quality",
+  pastel: "pill",
+  ocean: "barsThin",
+  cyberpunk: "barsDense",
+  matrix: "barsThick",
+  yacd: "pill"
+};
+
+function getLatencyPalette(themeId) {
+  return LATENCY_PALETTES[themeId] || LATENCY_PALETTES.default;
 }
 
-function qualityDotClass(val) {
+function getLatencyVariantForTheme(themeId) {
+  return THEME_LATENCY_VARIANT[themeId] || "classic";
+}
+
+function getLatencyBarConfig(themeId) {
+  return LATENCY_BAR_CONFIG[themeId] || LATENCY_BAR_CONFIG.default;
+}
+
+function getLatencyColor(val, themeId) {
+  if (val === "error" || val === null || val === undefined)
+    return "text-slate-500";
+  const palette = getLatencyPalette(themeId);
+  if (val < 80) return palette.text[0];
+  if (val < 150) return palette.text[1];
+  if (val < 250) return palette.text[2];
+  return palette.text[3];
+}
+
+function qualityDotClass(val, themeId) {
   if (val === "error" || val === null || val === undefined)
     return "bg-slate-500";
-  if (val < 80) return "bg-emerald-400";
-  if (val < 150) return "bg-lime-300";
-  if (val < 250) return "bg-yellow-300";
-  return "bg-rose-400";
+  const palette = getLatencyPalette(themeId);
+  if (val < 80) return palette.bg[0];
+  if (val < 150) return palette.bg[1];
+  if (val < 250) return palette.bg[2];
+  return palette.bg[3];
+}
+
+function latencyQualityLabel(val) {
+  if (val === "error") return "Error";
+  if (val === null || val === undefined) return "Unknown";
+  if (val < 80) return "Excellent";
+  if (val < 150) return "Good";
+  if (val < 250) return "Fair";
+  return "Poor";
 }
 
 export default function Proxies() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
+  const { themeId } = useTheme();
 
   const [latency, setLatency] = useState({});
   const [testingGroup, setTestingGroup] = useState("");
@@ -61,6 +151,9 @@ export default function Proxies() {
 
   // simple / advanced view
   const [viewMode, setViewMode] = useState("advanced"); // 'simple' | 'advanced'
+
+  // latency display: 'number' | 'bars'
+  const [latencyView, setLatencyView] = useState("number");
 
   // search
   const [search, setSearch] = useState("");
@@ -97,6 +190,8 @@ export default function Proxies() {
     }, intervalSec * 1000);
     return () => clearInterval(id);
   }, [autoRefresh, intervalSec]);
+
+  
 
   const handleSwitch = async (group, proxy) => {
     await apiPut(`/proxies/${encodeURIComponent(group)}`, { name: proxy });
@@ -154,7 +249,7 @@ export default function Proxies() {
     }));
   };
 
-  // filter berdasarkan search
+  // filter berdasarkan search (urutan tetap mengikuti urutan dari backend)
   const entriesRaw = Object.entries(proxies).filter(
     ([, proxy]) => Array.isArray(proxy.all)
   );
@@ -170,16 +265,11 @@ export default function Proxies() {
     <div className="space-y-4">
       {/* page header */}
       <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-        <div>
-          <h1 className="text-lg md:text-xl font-semibold tracking-tight">
-            Proxies
-          </h1>
-          <p className="text-xs text-slate-400">
-            Group selector & latency monitor dari /proxies.
-          </p>
-        </div>
+        <h1 className="text-lg md:text-xl font-semibold tracking-tight">
+          Proxies
+        </h1>
 
-        <div className="flex flex-wrap items-center gap-2 justify-between md:justify-end">
+        <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2 sm:gap-2 md:justify-end">
           {/* view mode toggle */}
           <div className="flex items-center text-[11px] border border-slate-700/80 rounded-2xl bg-slate-950/60 overflow-hidden">
             <button
@@ -201,6 +291,30 @@ export default function Proxies() {
               }`}
             >
               Advanced
+            </button>
+          </div>
+
+          {/* latency view toggle */}
+          <div className="flex items-center text-[11px] border border-slate-700/80 rounded-2xl bg-slate-950/60 overflow-hidden">
+            <button
+              onClick={() => setLatencyView("number")}
+              className={`px-3 py-1 ${
+                latencyView === "number"
+                  ? "bg-sky-500/20 text-sky-100"
+                  : "text-slate-400"
+              }`}
+            >
+              ms
+            </button>
+            <button
+              onClick={() => setLatencyView("bars")}
+              className={`px-3 py-1 ${
+                latencyView === "bars"
+                  ? "bg-sky-500/20 text-sky-100"
+                  : "text-slate-400"
+              }`}
+            >
+              Bars
             </button>
           </div>
 
@@ -266,7 +380,7 @@ export default function Proxies() {
       <section className="space-y-4 max-w-4xl mx-auto">
         {entries.length === 0 && !loading && (
           <div className="text-xs text-slate-500">
-            Tidak ada group proxy yang cocok dengan pencarian.
+            No proxy group matches the current search.
           </div>
         )}
 
@@ -282,6 +396,212 @@ export default function Proxies() {
           const showDetails =
             viewMode === "advanced" && !collapsed && allNames.length > 0;
 
+          const latencyVariant = getLatencyVariantForTheme(themeId);
+
+          const latencyText =
+            currentLatency === "error"
+              ? "ERR"
+              : currentLatency == null
+              ? "-"
+              : `${currentLatency} ms`;
+          const qualityLabel = latencyQualityLabel(currentLatency);
+          const qualityLevel =
+            currentLatency === "error" || currentLatency == null
+              ? 0
+              : currentLatency < 80
+              ? 4
+              : currentLatency < 150
+              ? 3
+              : currentLatency < 250
+              ? 2
+              : 1;
+
+          const renderLatencyBars = (val) => {
+            const palette = getLatencyPalette(themeId);
+            const config = getLatencyBarConfig(themeId);
+            const count = config.count;
+            const heights = config.heights;
+
+            // map tinggi ke kelas Tailwind statis supaya tidak ada kelas dinamis
+            const heightClassFor = (h) => {
+              switch (h) {
+                case 3:
+                  return "h-[3px]";
+                case 4:
+                  return "h-[4px]";
+                case 6:
+                  return "h-[6px]";
+                case 7:
+                  return "h-[7px]";
+                case 8:
+                  return "h-[8px]";
+                case 9:
+                  return "h-[9px]";
+                case 10:
+                  return "h-[10px]";
+                case 12:
+                  return "h-[12px]";
+                case 13:
+                  return "h-[13px]";
+                default:
+                  return "h-[4px]";
+              }
+            };
+
+            if (val === "error" || val == null) {
+              return (
+                <span className="flex items-end gap-0.5">
+                  {Array.from({ length: count }).map((_, i) => (
+                    <span
+                      key={i}
+                      className={`w-0.5 rounded-full ${
+                        i === 0 ? "h-[6px] bg-slate-600" : "h-[3px] bg-slate-700"
+                      }`}
+                    />
+                  ))}
+                </span>
+              );
+            }
+
+            const baseLevel = val < 80 ? 4 : val < 150 ? 3 : val < 250 ? 2 : 1;
+            const level = Math.max(
+              1,
+              Math.min(count, Math.round((baseLevel / 4) * count))
+            );
+
+            return (
+              <span className="flex items-end gap-0.5">
+                {Array.from({ length: count }).map((_, idx) => {
+                  const i = idx + 1;
+                  const isActive = i <= level;
+                  const heightClass = heightClassFor(heights[idx]);
+                  return (
+                    <span
+                      key={i}
+                      className={`w-0.5 rounded-full ${
+                        isActive
+                          ? `${palette.bar} ${heightClass}`
+                          : "bg-slate-700 h-[4px]"
+                      }`}
+                    />
+                  );
+                })}
+              </span>
+            );
+          };
+
+          const renderHeaderLatencyIndicator = () => {
+            const colorClass = getLatencyColor(currentLatency, themeId);
+            const qualityText = qualityLabel;
+            const levelPercent =
+              qualityLevel <= 0 ? 0 : (qualityLevel / 4) * 100;
+
+            switch (latencyVariant) {
+              case "pill":
+                return (
+                  <div className="flex items-center gap-1.5">
+                    <span
+                      className={`px-2.5 py-0.5 rounded-full text-[11px] border border-sky-500/60 bg-gradient-to-r from-sky-500/20 via-emerald-500/10 to-fuchsia-500/20 ${colorClass}`}
+                    >
+                      {latencyText}
+                    </span>
+                    <span className="hidden sm:inline text-[10px] text-slate-300">
+                      {qualityText}
+                    </span>
+                  </div>
+                );
+              case "chip":
+                return (
+                  <div className="flex items-center gap-1.5">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] border border-slate-600/80 bg-slate-900/80 text-slate-100">
+                      {qualityText}
+                    </span>
+                    <span className={`text-[10px] ${colorClass}`}>
+                      {latencyText}
+                    </span>
+                  </div>
+                );
+              case "dot":
+                return (
+                  <div className="flex items-center gap-1.5">
+                    <span
+                      className={`w-2.5 h-2.5 rounded-full shadow-inner ${qualityDotClass(
+                        currentLatency,
+                        themeId
+                      )}`}
+                    />
+                    <span className={`text-[11px] ${colorClass}`}>
+                      {latencyText}
+                    </span>
+                  </div>
+                );
+              case "quality":
+                return (
+                  <div className="flex items-center gap-1.5">
+                    <span className="px-2 py-0.5 rounded-full text-[11px] border border-slate-600/80 bg-slate-900/80 text-slate-100">
+                      {qualityText}
+                    </span>
+                  </div>
+                );
+              case "barsThin":
+              case "barsThick":
+              case "barsDense":
+                return (
+                  <div className="flex items-center gap-1.5">
+                    <div className="px-2 py-0.5 rounded-full border border-slate-700/80 bg-slate-950/80 text-[11px]">
+                      <div className="flex items-end gap-0.5">
+                        {renderLatencyBars(currentLatency)}
+                      </div>
+                    </div>
+                    <span className="hidden sm:inline text-[10px] text-slate-300">
+                      {qualityText}
+                    </span>
+                  </div>
+                );
+              case "barProgress":
+                return (
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-20 h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-sky-400"
+                        style={{ width: `${levelPercent}%` }}
+                      />
+                    </div>
+                    <span className="hidden sm:inline text-[10px] text-slate-300">
+                      {qualityText}
+                    </span>
+                  </div>
+                );
+              case "hybrid":
+                return (
+                  <div className="flex items-center gap-1.5">
+                    <span
+                      className={`px-2 py-0.5 rounded-full border border-slate-700/80 bg-slate-950/80 text-[11px] ${colorClass}`}
+                    >
+                      {latencyText}
+                    </span>
+                    <div className="hidden sm:flex items-end gap-0.5">
+                      {renderLatencyBars(currentLatency)}
+                    </div>
+                  </div>
+                );
+              case "classic":
+              default:
+                return (
+                  <div className="flex items-center gap-1.5">
+                    <span
+                      className={`px-2 py-0.5 rounded-full border border-slate-700/80 bg-slate-900/80 text-[11px] ${colorClass}`}
+                    >
+                      {latencyText}
+                    </span>
+                    <span className="text-[10px] text-slate-400">
+                      {qualityText}
+                    </span>
+                  </div>
+                );
+            }
+          };
+
           return (
             <Card key={name} className="flex flex-col gap-2">
               {/* header card: quality dot + nama + latency + Test all + hide */}
@@ -289,23 +609,14 @@ export default function Proxies() {
                 <div className="flex items-center gap-2">
                   <span
                     className={`w-2 h-2 rounded-full ${qualityDotClass(
-                      currentLatency
+                      currentLatency,
+                      themeId
                     )}`}
                   />
                   <span className="text-sm font-semibold text-slate-100">
                     {name}
                   </span>
-                  <span
-                    className={`px-2 py-0.5 rounded-full border border-slate-700/80 bg-slate-900/80 text-[11px] ${getLatencyColor(
-                      currentLatency
-                    )}`}
-                  >
-                    {currentLatency === "error"
-                      ? "ERR"
-                      : currentLatency == null
-                      ? "-"
-                      : `${currentLatency} ms`}
-                  </span>
+                  {renderHeaderLatencyIndicator()}
                 </div>
 
                 <div className="flex items-center gap-1">
@@ -329,11 +640,36 @@ export default function Proxies() {
                 </div>
               </div>
 
-              {/* info kecil */}
-              <div className="text-[11px] text-slate-400">
-                Type:{" "}
-                <span className="text-slate-200">{proxy.type}</span> • Now:{" "}
-                <span className="text-sky-300 font-medium">{proxy.now}</span>
+              {/* info kecil + small latency dots for group */}
+              <div className="text-[11px] text-slate-400 flex flex-col gap-1">
+                <div>
+                  Type:{" "}
+                  <span className="text-slate-200">{proxy.type}</span> • Now:{" "}
+                  <span className="text-sky-300 font-medium">{proxy.now}</span>
+                </div>
+                {(viewMode === "simple" || collapsed) && allNames.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mt-0.5">
+                    {allNames.map((p) => {
+                      const lat = latency[p];
+                      return (
+                        <span
+                          key={p}
+                          className={`w-3 h-3 md:w-3.5 md:h-3.5 rounded-full ${qualityDotClass(
+                            lat,
+                            themeId
+                          )}`}
+                          title={`${p}${
+                            lat == null
+                              ? ""
+                              : lat === "error"
+                              ? " (ERR)"
+                              : ` (${lat} ms)`
+                          }`}
+                        />
+                      );
+                    })}
+                  </div>
+                )}
               </div>
 
               {/* daftar tag dalam 2 kolom (hanya advanced) */}
@@ -368,36 +704,35 @@ export default function Proxies() {
                           title={p}
                         >
                           <span className="text-left truncate">{p}</span>
-                          <span
-                            className={`${getLatencyColor(
-                              lat
-                            )} text-[10px] text-right shrink-0 ml-1`}
-                          >
-                            {latText}
-                          </span>
+                          {latencyView === "number" ? (
+                            <span
+                              className={`${getLatencyColor(
+                                lat,
+                                themeId
+                              )} text-[10px] text-right shrink-0 ml-1`}
+                            >
+                              {latText}
+                            </span>
+                          ) : (
+                            <span className="flex justify-end shrink-0 ml-1">
+                              {renderLatencyBars(lat)}
+                            </span>
+                          )}
                         </button>
                       );
                     })}
                   </div>
                 )}
               </div>
-
-              {viewMode === "simple" && (
-                <div className="text-[11px] text-slate-500 mt-1">
-                  Simple view: daftar node disembunyikan. Gunakan mode
-                  <span className="text-sky-300"> Advanced</span> untuk melihat
-                  semua tag.
-                </div>
-              )}
             </Card>
           );
         })}
       </section>
 
-      {/* indicator kecil untuk mobile */}
+      {/* small indicator for mobile */}
       <div className="md:hidden text-[11px] text-slate-400">
-        Auto-refresh: {autoRefresh ? `${intervalSec}s` : "Off"} (ubah di versi
-        desktop)
+        Auto-refresh: {autoRefresh ? `${intervalSec}s` : "Off"} (change from
+        desktop view)
       </div>
     </div>
   );

@@ -53,14 +53,9 @@ export default function Rules() {
   return (
     <div className="space-y-4">
       <header className="flex items-center justify-between gap-2">
-        <div>
-          <h1 className="text-lg md:text-xl font-semibold tracking-tight">
-            Rules
-          </h1>
-          <p className="text-xs text-slate-400">
-            Daftar rules dari /rules (format menyesuaikan Sing-box).
-          </p>
-        </div>
+        <h1 className="text-lg md:text-xl font-semibold tracking-tight">
+          Rules
+        </h1>
         <Button size="sm" onClick={load} disabled={loading}>
           {loading ? "Loading..." : "Refresh"}
         </Button>
@@ -76,7 +71,7 @@ export default function Rules() {
         <div className="text-xs font-mono space-y-2 max-h-[420px] overflow-y-auto">
           {rules.length === 0 && !err && (
             <div className="text-slate-500">
-              Tidak ada rules atau API /rules mengembalikan list kosong.
+              No rules or /rules returned an empty list.
             </div>
           )}
           {rules.map((r, i) => (

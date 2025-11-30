@@ -68,7 +68,7 @@ export default function Profiles() {
       setNote("");
       setMsg(`Saved profile: ${p.name}`);
     } catch (e) {
-      setErr("Gagal membuat snapshot: " + (e.message || String(e)));
+      setErr("Failed to create snapshot: " + (e.message || String(e)));
     } finally {
       setBusy(false);
     }
@@ -99,7 +99,7 @@ export default function Profiles() {
       });
       setMsg(`Restored runtime config from profile: ${p.name}`);
     } catch (e) {
-      setErr("Gagal restore: " + (e.message || String(e)));
+      setErr("Failed to restore: " + (e.message || String(e)));
     } finally {
       setBusy(false);
     }
@@ -107,17 +107,11 @@ export default function Profiles() {
 
   return (
     <div className="space-y-4">
-      {/* header halaman */}
+      {/* page header */}
       <header className="flex items-center justify-between gap-2">
-        <div>
-          <h1 className="text-lg md:text-xl font-semibold tracking-tight">
-            Profiles
-          </h1>
-          <p className="text-xs text-slate-400">
-            Simpan & kelola snapshot konfigurasi Sing-box (configs + proxies)
-            secara lokal di browser.
-          </p>
-        </div>
+        <h1 className="text-lg md:text-xl font-semibold tracking-tight">
+          Profiles
+        </h1>
       </header>
 
       {(msg || err) && (
@@ -135,27 +129,26 @@ export default function Profiles() {
         </div>
       )}
 
-      {/* card buat snapshot */}
+      {/* snapshot card */}
       <Card
         title="Create snapshot"
-        description="Ambil configs + proxies saat ini dan simpan sebagai profile lokal."
       >
         <div className="space-y-3 text-xs">
           <div className="grid gap-3 md:grid-cols-2">
             <div className="space-y-1">
-              <div className="text-slate-400">Name (opsional)</div>
+              <div className="text-slate-400">Name (optional)</div>
               <input
                 className="w-full rounded-2xl bg-slate-950/40 border border-slate-700/80 px-3 py-2 text-xs outline-none focus:border-sky-500"
-                placeholder="Misal: Stable gaming 4G"
+                placeholder="e.g. Stable gaming 4G"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
             </div>
             <div className="space-y-1">
-              <div className="text-slate-400">Note (opsional)</div>
+              <div className="text-slate-400">Note (optional)</div>
               <input
                 className="w-full rounded-2xl bg-slate-950/40 border border-slate-700/80 px-3 py-2 text-xs outline-none focus:border-sky-500"
-                placeholder="Contoh: Ping bagus ke SG & ID"
+                placeholder="e.g. Good ping to SG & ID"
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
               />
@@ -166,17 +159,17 @@ export default function Profiles() {
             {busy ? "Saving..." : "Save snapshot"}
           </Button>
           <div className="text-[11px] text-slate-500">
-            Data profile disimpan di browser (localStorage). Maksimal 20
-            profile terakhir akan dipertahankan.
+            Profiles are stored in the browser (localStorage). Up to 20 recent
+            profiles are kept.
           </div>
         </div>
       </Card>
 
-      {/* card list profile */}
+      {/* saved profiles list */}
       <Card title="Saved profiles">
         {profiles.length === 0 ? (
           <div className="text-xs text-slate-500">
-            Belum ada profile. Buat snapshot dulu di atas.
+            No profiles yet. Create a snapshot above first.
           </div>
         ) : (
           <div className="space-y-2 max-h-[420px] overflow-y-auto text-xs">
