@@ -40,7 +40,6 @@ export const updateConfig = (patch) => apiPut("/configs", patch);
 export const getProxies = () => apiGet("/proxies");
 export const getRules = () => apiGet("/rules");
 export const getConnections = () => apiGet("/connections");
-export const getMemoryStats = () => apiGet("/memory");
 
 /* 🔥 WebSocket traffic (up/down B/s) */
 export function connectTraffic() {
@@ -49,6 +48,14 @@ export function connectTraffic() {
   // http -> ws
   url = url.replace(/^http/, "ws");
   return new WebSocket(url + "/traffic");
+}
+
+/* 🔥 WebSocket memory (inuse / oslimit) ala Yacd-meta */
+export function connectMemory() {
+  const cfg = getApiConfig();
+  let url = cfg.baseUrl.replace(/\/+$/, "");
+  url = url.replace(/^http/, "ws");
+  return new WebSocket(url + "/memory");
 }
 
 /* 🔥 WebSocket logs */

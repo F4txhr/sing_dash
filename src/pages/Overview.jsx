@@ -3,7 +3,7 @@ import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
 import TrafficChart from "../components/overview/TrafficChart";
 import ConnectionsSnapshot from "../components/overview/ConnectionsSnapshot";
-import { getConnections, connectTraffic, getMemoryStats } from "../lib/clashApi";
+import { getConnections, connectTraffic, connectMemory } from "../lib/clashApi";
 import { formatBytes, formatSpeed } from "../lib/utils";
 import { useConnectionStatus } from "../lib/connectionStatus";
 
@@ -155,24 +155,27 @@ export default function Overview() {
     loadConnections();
   }, []);
 
-  // optional: memory usage (if backend exposes /memory)
+  // optional: memory usage (if backend exposes /memory ala Yacd-meta)
   useEffect(() => {
-    let cancelled = false;
-
-    const loadMemory = async () => {
-      try {
-        const m = await getMemoryStats();
-        if (cancelled) return;
-        setMemoryInfo(m);
-      } catch {
-        // ignore: backend may not expose /memory
-      }
-    };
-
-    loadMemory();
+    let ws;
+    try {
+      ws = connectMemory();
+      ws.onmessage = (evt) => {
+        try {
+          const data = JSON.parse(evt.data);
+          setMemoryInfo(data);
+        } catch (e) {
+          console.warn("[Overview] invalid memory message:", evt.data, e);
+        }
+      };
+    } catch (e) {
+      console.warn("[Overview] failed to open memory WS:", e);
+    }
 
     return () => {
-      cancelled = true;
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.close();
+      }
     };
   }, []);
 
